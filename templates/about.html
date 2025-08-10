@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}About Us{% endblock %}
+{% block content %}
+    <section class="container my-5">
+        <h2 class="section-title">Our Vision</h2>
+        <p>To be a leading research intensive college in Africa recognized internationally for its quality, relevance and impact.</p>
+        <h2 class="section-title">Our Mission</h2>
+        <p>To pursue recognition and excellence in teaching, learning, and research, integrating with society and communities.</p>
+        <!-- Add more sections from PDF as needed -->
+        {% for section in sections %}
+            <h2 class="section-title" >{{ section.title }}</h2>
+            <p>{{ section.content }}</p>
+        {% endfor %}
+    </section>
+{% endblock %}

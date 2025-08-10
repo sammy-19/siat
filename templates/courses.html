@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Courses on Offer | Sunrise Institute of Applied Sciences and Technology{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4" style="color: #FF8C00;">Our Courses</h2>
+        
+        <h3 style="color: #DAA520;">Short Certificate Courses</h3>
+        <div class="row">
+            {% for course in short_courses %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow">
+                    {% if course.image %}
+                    <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }} thumbnail">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text">{{ course.description }}</p>
+                        <p>Duration: {{ course.duration }} | Fee: K{{ course.fee }}</p>
+                        <a href="{% url 'enroll_course' course.slug %}" class="btn btn-primary" style="background-color: #FF8C00;">Enroll Now</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <h3 style="color: #DAA520;">Diploma Courses</h3>
+        <div class="row">
+            {% for course in diploma_courses %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow">
+                    {% if course.image %}
+                    <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }} thumbnail">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text">{{ course.description }}</p>
+                        <p>Duration: {{ course.duration }} | Fee: K{{ course.fee }}</p>
+                        <a href="{% url 'enroll_course' course.slug %}" class="btn btn-primary" style="background-color: #FF8C00;">Enroll Now</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<meta name="description" content="{{ meta_description }}">
+<meta name="keywords" content="{{ meta_keywords }}">
+{% endblock %}

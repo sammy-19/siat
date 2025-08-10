@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+    <section class="hero">
+        <div class="container">
+            <h1>Boost Your Skills in Just 2 Weeks</h1>
+            <p>Online courses to further your career. Register now!</p>
+            <a href="/courses/" class="btn btn-primary">View Courses</a>
+        </div>
+    </section>
+    <section class="container my-5">
+        <h2 class="section-title">Featured Courses</h2>
+        <div class="row">
+            {% for course in courses %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ course.name }}</h5>
+                            <p class="card-text">{{ course.description }}</p>
+                            <p>Duration: {{ course.duration }}</p>
+                            <a href="/enroll/" class="btn btn-primary">Enroll Now</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}

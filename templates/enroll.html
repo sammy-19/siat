@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% block title %}Apply{% endblock %}
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-4" style="color: #FF8C00;">Enrollment Application for {% if course %}{{ course.title }}{% else %}a Course{% endif %}</h2>
+        <form method="post" enctype="multipart/form-data" class="mx-auto shadow p-4 bg-white rounded" style="max-width: 800px;">
+            {% csrf_token %}
+            
+            <!-- Accordion for Sections -->
+            <div class="accordion" id="enrollAccordion">
+                
+                <!-- Personal Info -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingPersonal">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePersonal" aria-expanded="true" aria-controls="collapsePersonal" style="background-color: #0A2540; color: #FFFFFF;">
+                            Personal Information
+                        </button>
+                    </h2>
+                    <div id="collapsePersonal" class="accordion-collapse collapse show" aria-labelledby="headingPersonal">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                {{ form.full_name.label_tag }}
+                                {{ form.full_name }}
+                                {{ form.full_name.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.email.label_tag }}
+                                {{ form.email }}
+                                {{ form.email.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.phone.label_tag }}
+                                {{ form.phone }}
+                                {{ form.phone.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.gender.label_tag }}
+                                {{ form.gender }}
+                                {{ form.gender.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.date_of_birth.label_tag }}
+                                {{ form.date_of_birth }}
+                                {{ form.date_of_birth.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Education -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingEducation">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEducation" aria-expanded="false" aria-controls="collapseEducation" style="background-color: #0A2540; color: #FFFFFF;">
+                            Education Background
+                        </button>
+                    </h2>
+                    <div id="collapseEducation" class="accordion-collapse collapse" aria-labelledby="headingEducation">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                {{ form.highest_qualification.label_tag }}
+                                {{ form.highest_qualification }}
+                                {{ form.highest_qualification.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.education_background.label_tag }}
+                                {{ form.education_background }}
+                                {{ form.education_background.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Next of Kin -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingKin">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseKin" aria-expanded="false" aria-controls="collapseKin" style="background-color: #0A2540; color: #FFFFFF;">
+                            Next of Kin
+                        </button>
+                    </h2>
+                    <div id="collapseKin" class="accordion-collapse collapse" aria-labelledby="headingKin">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                {{ form.next_of_kin_name.label_tag }}
+                                {{ form.next_of_kin_name }}
+                                {{ form.next_of_kin_name.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.next_of_kin_relationship.label_tag }}
+                                {{ form.next_of_kin_relationship }}
+                                {{ form.next_of_kin_relationship.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.next_of_kin_contact.label_tag }}
+                                {{ form.next_of_kin_contact }}
+                                {{ form.next_of_kin_contact.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Identity & Disability -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingIdentity">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIdentity" aria-expanded="false" aria-controls="collapseIdentity" style="background-color: #0A2540; color: #FFFFFF;">
+                            Identity & Disability Status
+                        </button>
+                    </h2>
+                    <div id="collapseIdentity" class="accordion-collapse collapse" aria-labelledby="headingIdentity">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                {{ form.identity_type.label_tag }}
+                                {{ form.identity_type }}
+                                {{ form.identity_type.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.identity_number.label_tag }}
+                                {{ form.identity_number }}
+                                {{ form.identity_number.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.disability_status.label_tag }}
+                                {{ form.disability_status }}
+                                {{ form.disability_status.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.disability_details.label_tag }}
+                                {{ form.disability_details }}
+                                {{ form.disability_details.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Documents -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingDocuments">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDocuments" aria-expanded="false" aria-controls="collapseDocuments" style="background-color: #0A2540; color: #FFFFFF;">
+                            Document Uploads
+                        </button>
+                    </h2>
+                    <div id="collapseDocuments" class="accordion-collapse collapse" aria-labelledby="headingDocuments">
+                        <div class="accordion-body">
+                            <p class="mb-3"><small>Accepted: PDF, JPG, PNG. Required: Identity Doc. For Diplomas: Secondary Results.</small></p>
+                            <div class="mb-3">
+                                {{ form.identity_document.label_tag }}
+                                {{ form.identity_document }}
+                                {{ form.identity_document.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.secondary_results.label_tag }}
+                                {{ form.secondary_results }}
+                                {{ form.secondary_results.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Other -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOther">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOther" aria-expanded="false" aria-controls="collapseOther" style="background-color: #0A2540; color: #FFFFFF;">
+                            Course & Message
+                        </button>
+                    </h2>
+                    <div id="collapseOther" class="accordion-collapse collapse" aria-labelledby="headingOther">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                {{ form.course.label_tag }}
+                                {{ form.course }}
+                                {{ form.course.errors }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.message.label_tag }}
+                                {{ form.message }}
+                                {{ form.message.errors }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 mt-4" style="background-color: #FF8C00; border-color: #DAA520;">Submit Application</button>
+        </form>
+    </div>
+</section>
+
+<!-- SEO Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "College",
+  "name": "Sunrise Institute of Applied Sciences and Technology",
+  "url": "https://www.siat.edu/",
+  "applicationForm": {
+    "@type": "WebPage",
+    "url": "https://www.siat.edu/enroll/"
+  }
+}
+</script>
+
+<meta name="description" content="{{ meta_description }}">
+<meta name="keywords" content="{{ meta_keywords }}">
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5 text-center">
+    <div class="container">
+        <h2 style="color: #FF8C00;">Thank You!</h2>
+        <p>Your application has been submitted. We'll contact you soon.</p>
+        <a href="{% url 'courses' %}" class="btn btn-secondary">Back to Courses</a>
+    </div>
+</section>
+{% endblock %}

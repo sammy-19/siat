@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Contact{% endblock %}
+{% block content %}
+    <section class="container my-5">
+        <h2 class="section-title">Get in Touch</h2>
+        <p>Phone: {{ info.phone }}</p>
+        <p>Email: {{ info.email }}</p>
+        <p>Address: {{ info.address }}</p>
+    </section>
+{% endblock %}
