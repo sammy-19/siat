@@ -2,7 +2,8 @@ asgiref==3.9.1
 certifi==2025.8.3
 charset-normalizer==3.4.3
 cloudinary==1.44.1
-Django
+dj-database-url==3.0.1
+Django==5.2.5
 django-cloudinary-storage==0.3.0
 idna==3.10
 pillow==11.3.0
@@ -12,3 +13,4 @@ six==1.17.0
 sqlparse==0.5.3
 tzdata==2025.2
 urllib3==2.5.0
+whitenoise==6.9.0

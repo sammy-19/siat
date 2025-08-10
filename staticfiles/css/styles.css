@@ -1,0 +1,17 @@
+form .mb-3 label {
+    display: block;
+    color: #0A2540;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+form .mb-3 input, form .mb-3 select, form .mb-3 textarea {
+    width: 100%;
+    border: 1px solid #DAA520;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+}
+form .mb-3 .errorlist {
+    color: #8B0000;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
