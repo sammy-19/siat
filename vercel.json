@@ -2,14 +2,19 @@
   "version": 2,
   "builds": [
     {
-      "src": "siat_website/wsgi.py",
+      "src": "siat/wsgi.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb" }
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.9"
+      }
     },
     {
       "src": "build_files.sh",
       "use": "@vercel/static-build",
-      "config": { "distDir": "staticfiles" }
+      "config": {
+        "distDir": "staticfiles"
+      }
     }
   ],
   "routes": [
@@ -19,7 +24,10 @@
     },
     {
       "src": "/(.*)",
-      "dest": "siat_website/wsgi.py"
+      "dest": "siat/wsgi.py"
     }
-  ]
+  ],
+  "env": {
+    "PYTHON_VERSION": "3"
+  }
 }
