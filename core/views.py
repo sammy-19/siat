@@ -11,7 +11,7 @@ def home(request):
         'courses': courses,
         'site_name': 'Sunrise Institute of Applied Sciences and Technology',
         'site_description': 'Boost your skills and career with our 2-week online courses in applied sciences and technology.',
-        'keywords': 'online courses, applied sciences, technology education, SIAT Zambia',
+        'keywords': 'online courses, applied sciences, technology education, SIAT Zambia, sunrise institute,',
     }
     return render(request, 'home.html', context)
 
@@ -31,7 +31,7 @@ def courses(request):
         'short_courses': short_courses,
         'diploma_courses': diploma_courses,
         'meta_description': 'Explore Short Certificate and Diploma courses at SIAT to boost your career in business, IT, and more.',
-        'meta_keywords': 'short certificate courses, diploma courses, online learning SIAT, Kenya education',
+        'meta_keywords': 'short certificate courses, diploma courses, online learning SIAT, sunrise institute, sunrise-institute.net, education courses',
     }
     return render(request, 'courses.html', context)
 

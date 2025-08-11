@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-59mf_-3(6*i735h6@$cger@f@#gp#3lbja$ey9xn$!nr)&@nsk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['.vercel.app','now.sh','127.0.0.1']
+ALLOWED_HOSTS = ['www.sunrise-institute.net','sunrise-institute.net','.vercel.app','now.sh','127.0.0.1']
 
 
 # Application definition
@@ -168,3 +168,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SITE_NAME = 'Sunrise Institute of Applied Sciences and Technology'
 SITE_DESCRIPTION = 'Leading institute offering applied sciences, technology, and short online courses to boost skills and careers.'
 KEYWORDS = 'sunrise, sunrise institute, applied sciences, technology courses, online learning, Zambia education, SIAT'
+SITE_URL = 'www.sunrise-institute.net'
