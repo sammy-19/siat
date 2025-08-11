@@ -166,6 +166,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # SEO Basics (We'll handle meta tags in templates)
 SITE_NAME = 'Sunrise Institute of Applied Sciences and Technology'
-SITE_DESCRIPTION = 'Leading institute offering applied sciences, technology, and short online courses to boost skills and careers.'
-KEYWORDS = 'sunrise, sunrise institute, applied sciences, technology courses, online learning, Zambia education, SIAT'
+SITE_DESCRIPTION = 'SUNRISE INSTITUTE OF APPLIED SCIENCES AND TECHNOLOGY and its board value and embrace diversity, equality and inclusion as fundamental to our mission to educate students for career success within a context of global citizenship and social justice. We recognize that historical and persistent inequalities and barriers to equitable participation exist and are well documented in society and within the college.',
 SITE_URL = 'www.sunrise-institute.net'

@@ -2,16 +2,19 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Course, AboutSection, ContactInfo
 from django.core.mail import send_mail
 from django.conf import settings
-from .forms import EnrollmentForm
+from .forms import EnrollmentForm, ContactForm
 
 
 def home(request):
-    courses = Course.objects.all()
+    short_courses = Course.objects.filter(category='short_certificate')[:3]  # Top 3 short certs
+    diploma_courses = Course.objects.filter(category='diploma')[:3]  # Top 3 diplomas
     context = {
-        'courses': courses,
+        'short_courses': short_courses,
+        'diploma_courses': diploma_courses,
         'site_name': 'Sunrise Institute of Applied Sciences and Technology',
-        'site_description': 'Boost your skills and career with our 2-week online courses in applied sciences and technology.',
-        'keywords': 'online courses, applied sciences, technology education, SIAT Zambia, sunrise institute,',
+        'site_description': 'SUNRISE INSTITUTE OF APPLIED SCIENCES AND TECHNOLOGY and its board value and embrace diversity, equality and inclusion as fundamental to our mission to educate students for career success within a context of global citizenship and social justice. We recognize that historical and persistent inequalities and barriers to equitable participation exist and are well documented in society and within the college.',
+        'keywords': 'online courses, applied sciences, technology education, SIAT Zambia, sunrise institute, short certificate courses, diploma programs, diversity equity inclusion education, global citizenship, social justice training',
+        'meta_description': 'Discover short certificate and diploma courses at SIAT for career advancement in business, IT, and more. Embrace diversity and excellence in education.',
     }
     return render(request, 'home.html', context)
 
@@ -68,7 +71,7 @@ def enroll(request, course_slug=None):
         'form': form,
         'course': course,
         'meta_description': 'Apply online to SIAT courses. Secure form for personal, education, and document submission.',
-        'meta_keywords': 'SIAT enrollment form, online college application Kenya, diploma registration',
+        'meta_keywords': 'SIAT enrollment form, online college application, diploma registration',
     }
     return render(request, 'enroll.html', context)
 
@@ -80,10 +83,27 @@ def thank_you(request):
     return render(request, 'thank_you.html')
 
 def contact(request):
-    info = ContactInfo.objects.first()
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            message = form.save()  # Save to Neon DB
+            # Send email
+            email_subject = f"New Contact: {message.subject}"
+            email_message = f"From: {message.name} ({message.email})\nMessage: {message.message}"
+            send_mail(email_subject, email_message, settings.DEFAULT_FROM_EMAIL, [settings.EMAIL_HOST_USER])
+            return redirect('contact')  # Or thank you page
+    else:
+        form = ContactForm()
+    
+    info = {
+        'phone': '+260 076 251632',
+        'email': 'sunriseinstituteofapplied21@gmail.com',
+        'address': 'Sunrise Institute, Monze, Zambia',  # Placeholder from PDF/phone
+    }
     context = {
         'info': info,
-        'site_description': 'Get in touch with SIAT for inquiries about courses and registrations.',
-        'keywords': 'contact SIAT, Zambia institute contact',
+        'form': form,
+        'meta_description': 'Contact Sunrise Institute of Applied Sciences and Technology for inquiries on online courses, admissions, and more. Reach us via phone, email, or visit our address.',
+        'meta_keywords': 'SIAT contact, sunrise institute Zambia, applied sciences inquiries, technology education support, diversity equity education contact',
     }
     return render(request, 'contact.html', context)

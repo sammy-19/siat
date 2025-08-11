@@ -4,7 +4,70 @@
     <section class="container my-5">
         <h2 class="section-title">Get in Touch</h2>
         <p>Phone: {{ info.phone }}</p>
+        <p class="mb-4">Our phone line is available Monday to Friday, 07:00 to 18:00, for immediate assistance with course registrations, program details, or general inquiries. Feel free to call us for personalized guidance on boosting your career through our online courses or diploma programs.</p>
         <p>Email: {{ info.email }}</p>
+        <p class="mb-4">Send us an email for detailed questions about our mission, vision, or specific courses like Business Management or Information Technology. We respond within 24-48 hours and can provide information on our commitment to diversity, equity, inclusion, and quality education as outlined in our profile.</p>
         <p>Address: {{ info.address }}</p>
+        <p class="mb-4">Visit our campus for in-person consultations, enrollment support, or to learn more about our facilities. We're dedicated to creating an inclusive environment for learning, as per our guiding principles of social justice and global citizenship.</p>
     </section>
+
+    <!-- Additional Section: Contact Form for Modern Interactivity -->
+    <section class="container my-5 bg-light p-4 rounded shadow">
+        <h3 style="color: #0A2540;">Send Us a Message</h3>
+        <p>Fill out the form below to reach our team. Whether you're interested in our short certificate courses, diploma programs, or have questions about our quality assurance, research opportunities, or HIV/AIDS support initiatives, we'll get back to you promptly.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ form.name.label_tag }}
+                {{ form.name }}
+            </div>
+            <div class="mb-3">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+            </div>
+            <div class="mb-3">
+                {{ form.subject.label_tag }}
+                {{ form.subject }}
+            </div>
+            <div class="mb-3">
+                {{ form.message.label_tag }}
+                {{ form.message }}
+            </div>
+            <button type="submit" class="btn btn-primary" style="background-color: #FF8C00; border-color: #DAA520;">Submit</button>
+        </form>
+    </section>
+
+    <!-- Additional Section: Social Media Links (Inferred/Placeholder) -->
+    <section class="container my-5">
+        <h3 style="color: #0A2540;">Connect with Us Online</h3>
+        <p>Follow us on social media for updates on courses, events, and our commitment to gender equality, religious pluralism, and community development.</p>
+        <ul class="list-unstyled">
+            <li><a href="https://m.facebook.com/madzvision/?_rdc=1&_rdr#" style="color: #FF8C00;">Facebook</a> - Join discussions on education and social justice.</li>
+    </section>
+
+    <!-- Additional Section: Embedded Map for Visual Explanation -->
+    <section class="container my-5">
+        <h3 style="color: #0A2540;">Find Us on the Map</h3>
+        <p>Our location supports easy access for students from Zambia and beyond.</p>
+        <!-- iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3891.123456789!2d28.123456789!3d-15.123456789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTXCsDEyJzM0LjQiUyAyOMKwMDcnMjMuMiJF!5e0!3m2!1sen!2sus!4v1234567890" width="100%" height="400" style="border:0; border-radius: 0.25rem; border: 1px solid #DAA520;" allowfullscreen="" loading="lazy"></iframe>
+        <Update embed URL with real coordinates from address -->
+    </section>
+
+    <!-- SEO Enhancements -->
+    <meta name="description" content="{{ meta_description }}">
+    <meta name="keywords" content="{{ meta_keywords }}">
+
+    <!-- Schema.org JSON-LD for Contact Page SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPoint",
+      "telephone": "{{ info.phone }}",
+      "email": "{{ info.email }}",
+      "address": "{{ info.address }}",
+      "contactType": "Customer Support",
+      "areaServed": "Zambia",
+      "availableLanguage": "English"
+    }
+    </script>
 {% endblock %}

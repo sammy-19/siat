@@ -1,5 +1,5 @@
 from django import forms
-from .models import EnrollmentApplication, Course
+from .models import EnrollmentApplication, Course, ContactMessage
 
 class EnrollmentForm(forms.ModelForm):
     class Meta:
@@ -37,3 +37,11 @@ class EnrollmentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['course'].queryset = Course.objects.all()  # Dropdown of all courses
+        
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ['name', 'email', 'subject', 'message']
+        widgets = {
+            'message': forms.Textarea(attrs={'rows': 5}),
+        }
