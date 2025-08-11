@@ -1,11 +1,12 @@
-{% extend base.html %}
+{% extends 'base.html' %}
 
 {% block title %}{{ course.title }}{% endblock %}
 {% block content %}
 <div class="container my-5">
     <h1 class="text-primary">{{ course.title }}</h1> <!-- Navy blue -->
     <p>{{ course.description }}</p>
-    <p>Registration: K{{ course.registration_fee }} | Certificate: K{{ course.certificate_fee }}</p>
+    <p>Application: {{ course.registration_fee }}</p>
+    <a href="{% url 'enroll_course' course.slug %}" class="btn btn-primary" style="background-color: #0026ffff;">Apply Now</a>
     <meta name="description" content="Learn {{ course.title }} at SIAT Zambia. Boost your career in applied sciences.">
     <meta name="keywords" content="{{ course.title }}, SIAT courses, Zambia online education">
 </div>
