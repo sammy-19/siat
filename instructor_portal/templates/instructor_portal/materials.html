@@ -1,0 +1,64 @@
+{% extends 'instructor_portal/base.html' %}
+{% block title %}Materials Management{% endblock %}
+{% block header_title %}Manage Course Materials{% endblock %}
+{% block content %}
+<section class="py-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <h4>Upload New Material</h4>
+    <form method="post" enctype="multipart/form-data" class="card p-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="course_id" class="form-label">Course</label>
+            <select name="course_id" class="form-control" required>
+                {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="type" class="form-label">Material Type</label>
+            <select name="type" class="form-control" required>
+                <option value="outline">Course Outline</option>
+                <option value="module">Module</option>
+                <option value="video">Video</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="file" class="form-label">File (PDF/Video)</label>
+            <input type="file" name="file" class="form-control" required accept=".pdf,.mp4">
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+
+    <h4 class="mt-4">Existing Materials</h4>
+    {% for course in courses %}
+        <div class="card mt-3">
+            <div class="collapse-header" data-course="{{ course.id }}">
+                <i class="material-icons">folder</i> {{ course.title }} ({{ materials|dictsort:"course_id"|length }} materials)
+            </div>
+            <div class="collapse-content">
+                {% for material in materials|dictsort:"course_id" %}
+                    <div class="card-body">
+                        <h5>{{ material.title }} ({{ material.get_type_display }})</h5>
+                        <p>Uploaded: {{ material.created_at|date:"F d, Y" }}</p>
+                        <a href="{{ material.file.url }}" download class="btn btn-primary">Download</a>
+                        <a href="{% url 'instructor_portal:materials' %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    </div>
+                {% empty %}
+                    <p class="alert alert-info">No materials for this course.</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</section>
+{% endblock %}

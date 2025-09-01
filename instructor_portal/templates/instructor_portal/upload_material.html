@@ -1,0 +1,36 @@
+{% extends 'instructor_portal/base.html' %}
+{% block title %}Upload Material{% endblock %}
+{% block header_title %}Upload Material for {{ course.title }}{% endblock %}
+{% block content %}
+<section class="py-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <form method="post" enctype="multipart/form-data" class="card p-4" style="border-color: #DAA520;">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="type" class="form-label">Material Type</label>
+            <select name="type" class="form-control" required>
+                <option value="outline">Course Outline</option>
+                <option value="module">Module</option>
+                <option value="video">Video</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="file" class="form-label">File (PDF/Video)</label>
+            <input type="file" name="file" class="form-control" required accept=".pdf,.mp4">
+        </div>
+        <button type="submit" class="btn btn-primary" style="background-color: #FF8C00;">Upload</button>
+    </form>
+</section>
+<meta name="description" content="SIAT Instructor Portal - Upload course materials like PDFs and videos for applied sciences technology Zambia/Kenya.">
+<meta name="keywords" content="SIAT upload materials, sunrise institute course content Zambia, applied technology uploads Kenya">
+{% endblock %}

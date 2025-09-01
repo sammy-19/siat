@@ -8,7 +8,7 @@
     <meta name="description" content="{{ site_description }}">
     <meta name="keywords" content="{{ keywords }}">
     <meta name="author" content="Sunrise Institute of Applied Sciences and Technology">
-    <meta property="og:image" content="https://www.sunrise-institute.net/{% static 'images/logo.png' %}">
+    <meta property="og:image" content="https://www.sunrise-institute.net/static/images/logo.png">
     <meta property="og:url" content="https://www.sunrise-institute.net/">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="canonical" href="https://www.sunrise-institute.net" />
@@ -19,6 +19,29 @@
     <link rel="icon" type="image/x-icon" href="{% static 'images/logo.png' %}">
 
     <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "College ",
+          "name": "Sunrise Institute of Applied Sciences and Technology",
+          "url": "https://www.sunrise-institute.net",
+          "logo": "https://www.sunrise-institute.net/static/images/logo.png",
+          "email": "sunriseinstituteofapplied21@gmail.com",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "",
+            "addressLocality": "Monze",
+            "addressCountry": "Zambia"
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+260762516232",
+            "telephone": "+260972102339",
+            "email": "sunriseinstituteofapplied21@gmail.com",
+            "contactType": "Inquiry and Admissions"
+          }
+        }
+    </script>
     <style>
         :root {
             --primary-blue: #001F3F; /* Navy blue from poster */
@@ -58,6 +81,7 @@
                     <li class="nav-item"><a class="nav-link" href="/courses/">Courses</a></li>
                     <li class="nav-item"><a class="nav-link" href="/contact/">Contact</a></li>
                     <li class="nav-item"><a class="nav-link" href="/enroll/">Apply</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'student_portal:dashboard' %}">Portal</a></li>
                 </ul>
             </div>
         </div>
@@ -74,7 +98,6 @@
           "name": "Sunrise Institute of Applied Sciences and Technology",
           "url": "https://www.sunrise-institute.net",
           "logo": "https://www.sunrise-institute.net/static/images/logo.png",
-",
           "email": "sunriseinstituteofapplied21@gmail.com",
           "address": {
             "@type": "PostalAddress",

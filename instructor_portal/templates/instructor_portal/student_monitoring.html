@@ -1,0 +1,27 @@
+{% extends 'instructor_portal/base.html' %}
+{% block title %}Student Monitoring{% endblock %}
+{% block header_title %}Student Monitoring for {{ course.title }} (Enrolled: {{ num_enrolled }}){% endblock %}
+{% block content %}
+<section class="py-4">
+    <table class="table">
+        <thead>
+            <tr><th>Student Name</th><th>Student Number</th><th>Progress</th><th>Grade</th><th>View Profile</th></tr>
+        </thead>
+        <tbody>
+            {% for enrollment in enrollments %}
+            <tr>
+                <td>{{ enrollment.student.full_name }}</td>
+                <td>{{ enrollment.student.student_number }}</td>
+                <td>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ enrollment.progress }}%; background-color: var(--accent-orange);"></div>
+                    </div>
+                </td>
+                <td>{{ enrollment.grade|default:'Pending' }}</td>
+                <td><a href="#" class="btn btn-primary btn-sm">View</a></td> <!-- Link to profile view if added -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

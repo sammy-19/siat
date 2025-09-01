@@ -1,0 +1,31 @@
+{% extends 'student_portal/base.html' %}
+{% block title %}Profile{% endblock %}
+{% block header_title %}Profile{% endblock %}
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            {% if profile.profile_pic %}
+            <img src="{{ profile.profile_pic.url }}" alt="Profile Pic" class="rounded-circle mb-3" style="width: 150px; height: 150px; border: 2px solid var(--gold);">
+            {% endif %}
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn" style="background-color: var(--orange);">Save Changes</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.querySelector('input[type="file"]').addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = document.createElement('img');
+                img.src = event.target.result;
+                img.classList.add('rounded-circle', 'mb-3');
+                img.style.width = '150px';
+                img.style.height = '150px';
+                document.querySelector('.card-body').prepend(img);
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+    </script>
+{% endblock %}

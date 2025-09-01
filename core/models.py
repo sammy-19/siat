@@ -2,6 +2,18 @@ from django.db import models
 from cloudinary.models import CloudinaryField
 from django.utils.text import slugify
 
+
+# class AboutSection(models.Model):
+#     title = models.CharField(max_length=255)
+#     content = models.TextField()
+#     order = models.IntegerField(default=0)  # For sorting
+
+#     class Meta:
+#         ordering = ['order']
+
+#     def __str__(self):
+#         return self.title
+
 class Course(models.Model):
     CATEGORY_CHOICES = (
         ('short_certificate', 'Short Certificate Course'),
@@ -67,10 +79,18 @@ class EnrollmentApplication(models.Model):
     # Other
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     message = models.TextField(blank=True)
+    
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
     applied_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.full_name} - {self.course.title}"
+        return f"{self.full_name} - {self.course.title} ({self.status})"
     
 class AboutSection(models.Model):
     title = models.CharField(max_length=255)

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIAT Student Portal - Login</title>
+    <meta name="description" content="Secure login to Sunrise Institute of Applied Sciences and Technology student portal. Access courses, grades, assignments, and more in Zambia/Kenya.">
+    <meta name="keywords" content="SIAT student login, applied sciences portal Zambia, technology education dashboard Kenya, sunrise institute profile">
+    <meta name="robots" content="noindex, nofollow">  <!-- Private portal, prevent indexing -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #DAA520;
+            --red: #8B0000;
+            --blue: #0A2540;
+            --orange: #FF8C00;
+            --white: #FFFFFF;
+        }
+        body { font-family: 'Roboto', sans-serif; background-color: #F8F9FA; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .login-card { max-width: 400px; padding: 30px; background-color: var(--white); border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid var(--gold); }
+        .btn-login { background-color: var(--orange); border-color: var(--gold); color: var(--white); }
+        .btn-login:hover { background-color: var(--gold); color: var(--blue); }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2 class="text-center mb-4" style="color: var(--blue);">SIAT Student Portal Login</h2>
+        {% if form.errors %}
+        <div class="alert alert-danger">Invalid username or password.</div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label" style="color: var(--blue);">Username</label>
+                {{ form.username }}
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label" style="color: var(--blue);">Password</label>
+                {{ form.password }}
+            </div>
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    Your username and password didn't match. Please try again.
+                </div>
+            {% endif %}
+            <input type="hidden" name="next" value="{% url 'student_portal:dashboard' %}" />
+            <button type="submit" class="btn btn-login w-100">Login</button>
+            
+        </form>
+        
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{% extends 'instructor_portal/base.html' %}
+{% block title %}Grading{% endblock %}
+{% block header_title %}Grade Students{% endblock %}
+{% block content %}
+<section class="py-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <form method="post" class="card p-4">
+        {% csrf_token %}
+        <h4>Grade Students</h4>
+        {% for course in courses %}
+            <h5>{{ course.title }}</h5>
+            {% for enrollment in course.enrollment_set.all %}
+                <div class="mb-2">
+                    <label>{{ enrollment.student.full_name }}:</label>
+                    <input type="text" name="grade_{{ enrollment.id }}" value="{{ enrollment.grade }}" class="form-control d-inline" style="width: 60px;" placeholder="Grade">
+                </div>
+            {% empty %}
+                <p class="alert alert-info">No students enrolled in {{ course.title }}.</p>
+            {% endfor %}
+        {% endfor %}
+        <button type="submit" class="btn btn-primary mt-3">Save Grades</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'instructor_portal/base.html' %}
+{% block title %}Assignments Management{% endblock %}
+{% block header_title %}Manage Assignments{% endblock %}
+{% block content %}
+<section class="py-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <h4>Create New Assignment</h4>
+    <form method="post" enctype="multipart/form-data" class="card p-4">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="course_id" class="form-label">Course</label>
+            <select name="course_id" class="form-control" required>
+                {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea name="description" class="form-control" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="due_date" class="form-label">Due Date</label>
+            <input type="datetime-local" name="due_date" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="file" class="form-label">File (Optional)</label>
+            <input type="file" name="file" class="form-control" accept=".pdf,.docx">
+        </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+
+    <h4 class="mt-4">Existing Assignments</h4>
+    {% for assignment in assignments %}
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5>{{ assignment.title }}</h5>
+                <p>Course: {{ assignment.course.title }}</p>
+                <p>Due: {{ assignment.due_date|date:"F d, Y H:i" }}</p>
+                {% if assignment.file %}
+                    <a href="{% url 'instructor_portal:download_pdf' assignment.id %}" class="btn btn-primary">Download</a>
+                {% else %}
+                    <p class="alert alert-warning">No file attached for this assignment.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p class="alert alert-info">No assignments created.</p>
+    {% endfor %}
+</section>
+{% endblock %}

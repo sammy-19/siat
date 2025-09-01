@@ -1,0 +1,42 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Edit CMS Content{% endblock %}
+{% block header_title %}Edit or Add About Section{% endblock %}
+{% block content %}
+<section class="py-4">
+    <div class="card p-4" style="border-color: #DAA520;">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="alert alert-danger">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        </form>
+    </div>
+    <h3 class="mt-5">All About Sections</h3>
+    <div class="row">
+        {% for section in about_sections %}
+        <div class="col-md-12 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5>{{ section.title }}</h5>
+                    <p>{{ section.content|truncatewords:20 }}</p>
+                    <a href="{% url 'admin_panel:edit_about_section' section.pk %}" class="btn btn-primary">Edit</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="alert alert-danger">No sections available.</p>
+        {% endfor %}
+    </div>
+</section>
+<meta name="description" content="SIAT Admin CMS - Edit or add content sections like Vision and Mission for applied sciences technology Zambia/Kenya.">
+{% endblock %}

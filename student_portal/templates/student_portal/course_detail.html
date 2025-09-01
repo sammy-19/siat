@@ -1,0 +1,62 @@
+{% extends 'student_portal/base.html' %}
+{% block title %}Course Detail{% endblock %}
+{% block header_title %}Course: {{ course.title }}{% endblock %}
+{% block content %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Progress: {{ enrollment.progress }}%</h5>
+            <div class="progress mb-2">
+                <div class="progress-bar" style="width: {{ enrollment.progress }}%;"></div>
+            </div>
+            <h5>Grade: {{ enrollment.grade|default:'Pending' }}</h5>
+            <p>{{ course.description }}</p>
+        </div>
+    </div>
+    <h3>Assignments</h3>
+    <div class="row">
+        {% for assignment in assignments %}
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>{{ assignment.title }}</h5>
+                    <p>Due: <span style="color: var(--red);">{{ assignment.due_date }}</span></p>
+                    <a href="{% url 'student_portal:assignment_detail' assignment.pk %}" class="btn" style="background-color: var(--orange); color: var(--white);">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <h3>Learning Materials</h3>
+    <div class="row">
+        {% for type, materials in materials_by_type.items %}
+            {% if materials %}
+                <h4>{{ type|title }}s</h4>
+                {% for material in materials %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>{{ material.title }} ({{ material.get_type_display }})</h5>
+                                <p>Created: {{ material.created_at|date:"F d, Y" }}</p>
+                                <a href="{{ material.get_file_url }}" 
+                                   {% if material.type == 'video' %} 
+                                       target="_blank" 
+                                   {% else %} 
+                                       download 
+                                   {% endif %} 
+                                   class="btn btn-primary">
+                                    <i class="material-icons">{% if material.type == 'video' %}play_arrow{% else %}download{% endif %}</i> 
+                                    {% if material.type == 'video' %}Watch{% else %}Download{% endif %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="alert alert-info">No {{ type|title }} materials available.</p>
+            {% endif %}
+        {% endfor %}
+        {% if materials_by_type.outline|length == 0 and materials_by_type.module|length == 0 and materials_by_type.video|length == 0 %}
+            <p class="alert alert-info">No learning materials available for your enrolled courses.</p>
+        {% endif %}
+    </div>
+{% endblock %}

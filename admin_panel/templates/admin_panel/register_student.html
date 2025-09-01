@@ -1,0 +1,25 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Register Student{% endblock %}
+{% block header_title %}Register New Student{% endblock %}
+{% block content %}
+<section class="py-4">
+    <div class="card p-4" style="border-color: #DAA520;">
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="alert alert-danger">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Register Student</button>
+        </form>
+    </div>
+</section>
+<meta name="description" content="SIAT Admin CMS - Register students with auto-generated student numbers for applied sciences technology Zambia/Kenya.">
+{% endblock %}

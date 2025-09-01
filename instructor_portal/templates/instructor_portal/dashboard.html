@@ -1,0 +1,23 @@
+{% extends 'instructor_portal/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block header_title %}Welcome, {{ profile.full_name }}{% endblock %}
+{% block content %}
+<section class="py-4">
+    <h3>Your Courses</h3>
+    <div class="row">
+        {% for course in courses %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>{{ course.title }}</h5>
+                    <p>Enrolled Students: {{ num_enrolled }}</p>
+                    <a href="{% url 'instructor_portal:monitoring' %}" class="btn btn-primary">Monitor Students</a>
+                    <a href="{% url 'instructor_portal:materials' %}" class="btn btn-primary mt-2">Upload Materials</a>
+                    <a href="{% url 'instructor_portal:grading' %}" class="btn btn-primary mt-2">Manage Grades</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

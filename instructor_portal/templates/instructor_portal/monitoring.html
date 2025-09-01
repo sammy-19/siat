@@ -1,0 +1,24 @@
+{% extends 'instructor_portal/base.html' %}
+{% block title %}Student Monitoring{% endblock %}
+{% block header_title %}Monitor Students{% endblock %}
+{% block content %}
+<section class="py-4">
+    <h4>Student Monitoring</h4>
+    <p>Total Enrolled: {{ num_enrolled }}</p>
+    {% for course in courses %}
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5>{{ course.title }}</h5>
+                {% for enrollment in enrollments|dictsort:"course_id" %}
+                    <p>{{ enrollment.student.full_name }} - Progress: {{ enrollment.progress }}%</p>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: {{ enrollment.progress }}%; background-color: var(--accent-orange);"></div>
+                    </div>
+                {% empty %}
+                    <p class="alert alert-info">No students enrolled in {{ course.title }}.</p>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</section>
+{% endblock %}

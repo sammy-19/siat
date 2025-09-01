@@ -1,0 +1,38 @@
+{% extends 'student_portal/base.html' %}
+{% block title %}Assignments{% endblock %}
+{% block header_title %}Assignments{% endblock %}
+{% block content %}
+    <h3>Your Assignments</h3>
+    {% for assignment in assignments %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>{{ assignment.title }}</h5>
+            <p>{{ assignment.description }}</p>
+            <p>Due: <span style="color: var(--red);">{{ assignment.due_date }}</span></p>
+             {% if assignment.file %}
+                <a href="{% url 'instructor_portal:download_pdf' assignment.id %}" class="btn btn-primary">Download</a>
+            {% else %}
+                <p class="alert alert-warning">No file attached for this assignment.</p>
+            {% endif %}
+            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#submitModal{{ assignment.id }}" style="background-color: var(--orange); color: var(--white);">Submit</button>
+        </div>
+    </div>
+    <div class="modal fade" id="submitModal{{ assignment.id }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: var(--blue); color: var(--white);">
+                    <h5>Submit Assignment</h5>                    
+                </div>
+                <div class="modal-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
+                        {{ form.as_p }}                        
+                        <button type="submit" class="btn" style="background-color: var(--orange);">Upload</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endblock %}

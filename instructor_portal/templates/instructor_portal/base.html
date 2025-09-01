@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIAT Instructor Portal - {% block title %}Dashboard{% endblock %}</title>
+    <meta name="description" content="SIAT Instructor Portal - Manage courses, materials, assignments, grades, and student monitoring in applied sciences and technology education Zambia/Kenya.">
+    <meta name="keywords" content="SIAT instructor dashboard, sunrise institute teaching portal, applied sciences materials management Zambia, technology grades monitoring Kenya">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://www.sunrise-institute.net/instructor/">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0A2540;
+            --accent-orange: #FF8C00;
+            --gold: #DAA520;
+            --red: #8B0000;
+            --white: #FFFFFF;
+        }
+        body { font-family: 'Roboto', sans-serif; background-color: var(--white); color: var(--primary-blue); margin: 0; }
+        .sidebar { background-color: var(--primary-blue); color: var(--white); height: 100vh; width: 250px; padding: 20px; position: fixed; z-index: 1000; display: block; }
+        .sidebar a { color: var(--white); display: block; padding: 10px; text-decoration: none; }
+        .sidebar a:hover { background-color: var(--gold); color: var(--primary-blue); }
+        .offcanvas { background-color: var(--primary-blue); color: var(--white); }
+        .offcanvas .nav-link { color: var(--white); }
+        .offcanvas .nav-link:hover { background-color: var(--gold); color: var(--primary-blue); }
+        .main-content { margin-left: 250px; padding: 20px; }
+        .header { background-color: var(--gold); padding: 10px; text-align: center; }
+        .progress-bar { background-color: var(--accent-orange); animation: load 1s ease-in-out; }
+        @keyframes load { 0% { width: 0; } }
+        .card { border-color: var(--gold); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .material-icons { font-size: 24px; vertical-align: middle; margin-right: 10px; color: var(--accent-orange); }
+        .btn-primary { background-color: var(--accent-orange); border-color: var(--gold); }
+        .btn-primary:hover { background-color: var(--gold); color: var(--primary-blue); }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; }
+            .menu-icon { display: block !important; background-color: var(--accent-orange); color: var(--white); position: absolute; top: 10px; left: 10px; z-index: 1100; }
+        }
+        .menu-icon { display: none; }
+
+        /* Expand/Collapse styles */
+        .collapse-header { cursor: pointer; padding: 10px; background-color: var(--gold); color: var(--primary-blue); }
+        .collapse-header:hover { background-color: var(--accent-orange); }
+        .collapse-content { display: none; padding: 10px; }
+        .collapse-content.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="sidebarLabel" style="color: var(--accent-orange);">SIAT Instructor Portal</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" href="{% url 'instructor_portal:dashboard' %}"><i class="material-icons">dashboard</i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'instructor_portal:materials' %}"><i class="material-icons">library_books</i> Materials</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'instructor_portal:assignments' %}"><i class="material-icons">assignment</i> Assignments</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'instructor_portal:submissions' %}"><i class="material-icons">description</i> Submissions</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'instructor_portal:grading' %}"><i class="material-icons">grading</i> Grading</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'instructor_portal:monitoring' %}"><i class="material-icons">visibility</i> Monitoring</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'instructor_portal:instructor_logout' %}"><i class="material-icons">logout</i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+    <button class="btn menu-icon" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+        <i class="material-icons">menu</i>
+    </button>
+    <div class="sidebar d-none d-md-block">
+        <h4 style="color: var(--accent-orange);">SIAT Instructor Portal</h4>
+        <a href="{% url 'instructor_portal:dashboard' %}"><i class="material-icons">dashboard</i> Dashboard</a>
+        <a href="{% url 'instructor_portal:materials' %}"><i class="material-icons">library_books</i> Materials</a>
+        <a href="{% url 'instructor_portal:assignments' %}"><i class="material-icons">assignment</i> Assignments</a>
+        <a href="{% url 'instructor_portal:submissions' %}"><i class="material-icons">description</i> Submissions</a>
+        <a href="{% url 'instructor_portal:grading' %}"><i class="material-icons">grading</i> Grading</a>
+        <a href="{% url 'instructor_portal:monitoring' %}"><i class="material-icons">visibility</i> Monitoring</a>
+        <a href="{% url 'instructor_portal:instructor_logout' %}"><i class="material-icons">logout</i> Logout</a>
+    </div>
+    <div class="main-content">
+        <div class="header">
+            <h2 style="color: var(--primary-blue);">{% block header_title %}Instructor Dashboard{% endblock %}</h2>
+        </div>
+        {% block content %}{% endblock %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll('.collapse-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.classList.toggle('show');
+            });
+        });
+    </script>
+</body>
+</html>

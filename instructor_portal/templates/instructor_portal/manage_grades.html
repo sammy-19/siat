@@ -1,0 +1,25 @@
+{% extends 'instructor_portal/base.html' %}
+{% block title %}Manage Grades{% endblock %}
+{% block header_title %}Manage Grades for {{ course.title }}{% endblock %}
+{% block content %}
+<section class="py-4">
+    <form method="post" class="card p-4">
+        {% csrf_token %}
+        <table class="table">
+            <thead>
+                <tr><th>Student</th><th>Current Grade</th><th>New Grade</th></tr>
+            </thead>
+            <tbody>
+                {% for enrollment in enrollments %}
+                <tr>
+                    <td>{{ enrollment.student.full_name }}</td>
+                    <td>{{ enrollment.grade|default:'Pending' }}</td>
+                    <td><input type="text" name="grade_{{ enrollment.id }}" class="form-control" placeholder="A/B/C"></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Save Grades</button>
+    </form>
+</section>
+{% endblock %}

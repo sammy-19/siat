@@ -1,0 +1,37 @@
+{% extends 'student_portal/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block header_title %}Welcome, {{ profile.full_name }} (Progress: {{ overall_progress|floatformat:0 }}%){% endblock %}
+{% block content %}
+    <h3>Your Courses</h3>
+    <div class="progress mb-3">
+        <div class="progress-bar" style="width: {{ overall_progress }}%;"></div>
+    </div>
+    <div class="row">
+        {% for enrollment in enrollments %}
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5>{{ enrollment.course.title }}</h5>
+                    <p>Progress: {{ enrollment.progress }}%</p>
+                    <div class="progress mb-2">
+                        <div class="progress-bar" style="width: {{ enrollment.progress }}%;"></div>
+                    </div>
+                    <p>Grade: {{ enrollment.grade|default:'Pending' }}</p>
+                    <a href="{% url 'student_portal:course_detail' enrollment.course.pk %}" class="btn" style="background-color: var(--orange);">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <h3>Announcements</h3>
+    {% for announcement in announcements %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>{{ announcement.title }}</h5>
+            <p>{{ announcement.content|truncatewords:20 }}</p>
+        </div>
+    </div>
+    {% empty %}
+    <p>No announcements.</p>
+    {% endfor %}
+{% endblock %}

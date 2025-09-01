@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 import cloudinary
+import cloudinary.api
+import cloudinary.uploader
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'student_portal',
+    'instructor_portal',
+    'admin_panel',
     'cloudinary',
     'cloudinary_storage',
 ]
@@ -87,7 +92,6 @@ DATABASES = {
     }
 }
 
-"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -95,6 +99,18 @@ DATABASES = {
         'USER': os.getenv('NEON_DB_USER', 'neondb_owner'),
         'PASSWORD': os.getenv('NEON_DB_PASSWORD', 'npg_5gNFjIEf4kaY'),
         'HOST': os.getenv('NEON_DB_HOST', 'ep-silent-paper-aedkco2b-pooler.c-2.us-east-2.aws.neon.tech'),  # e.g., your-project.neon.tech
+        'PORT': os.getenv('NEON_DB_PORT', '5432'),
+        'OPTIONS': {'sslmode': 'require'},  # Neon requires SSL
+    }
+}
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('NEON_DB_NAME', 'neondb'),
+        'USER': os.getenv('NEON_DB_USER', 'neondb_owner'),
+        'PASSWORD': os.getenv('NEON_DB_PASSWORD', 'npg_D3pEQKdI5bNk'),
+        'HOST': os.getenv('NEON_DB_HOST', 'ep-cool-hill-ad09ewm9-pooler.c-2.us-east-1.aws.neon.tech'),  # e.g., your-project.neon.tech
         'PORT': os.getenv('NEON_DB_PORT', '5432'),
         'OPTIONS': {'sslmode': 'require'},  # Neon requires SSL
     }
@@ -163,6 +179,17 @@ cloudinary.config(
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGOUT_REDIRECT_URL = '/login/'
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Dev; change to 'smtp' for prod
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'sammyhills19@gmail.com'
+EMAIL_HOST_PASSWORD = 'theesamakahm'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # SEO Basics (We'll handle meta tags in templates)
 SITE_NAME = 'Sunrise Institute of Applied Sciences and Technology'

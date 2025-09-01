@@ -1,0 +1,32 @@
+{% extends 'instructor_portal/base.html' %}
+{% block title %}Submissions Management{% endblock %}
+{% block header_title %}Manage Submissions{% endblock %}
+{% block content %}
+<section class="py-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <h4>Student Submissions</h4>
+    {% for submission in submissions %}
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5>{{ submission.student.full_name }} - {{ submission.assignment.title }}</h5>
+                <p>Submitted: {{ submission.submitted_at|date:"F d, Y H:i" }}</p>
+                <a href="{{ submission.file.url }}" download class="btn btn-primary">Download</a>
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="submission_id" value="{{ submission.id }}">
+                    <input type="text" name="grade" value="{{ submission.grade }}" class="form-control d-inline" style="width: 60px;" placeholder="Grade">
+                    <button type="submit" class="btn btn-success">Save Grade</button>
+                </form>
+            </div>
+        </div>
+    {% empty %}
+        <p class="alert alert-info">No submissions received.</p>
+    {% endfor %}
+</section>
+{% endblock %}

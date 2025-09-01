@@ -1,0 +1,70 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block header_title %}Welcome to SIAT Admin CMS{% endblock %}
+{% block content %}
+<section class="py-4">
+    <h3>Student Overview</h3>
+    <div class="row">
+        {% for student in students %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>{{ student.full_name }}</h5>
+                    <p>Email: {{ student.email }}</p>
+                    <p>Student Number: {{ student.student_number }}</p>
+                    <p>Courses: {% for enrollment in student.enrollment_set.all %}{{ enrollment.course.title }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 30%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="alert alert-danger">No students registered yet.</p>
+        {% endfor %}
+    </div>
+
+    <h3 class="mt-5">Instructor Overview</h3>
+    <div class="row">
+        {% for instructor in instructors %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5>{{ instructor.full_name }}</h5>
+                    <p>Email: {{ instructor.email }}</p>
+                    <p>Courses: {% for course in instructor.courses_taught.all %}{{ course.title }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="alert alert-danger">No instructors registered yet.</p>
+        {% endfor %}
+    </div>
+
+    <h3 class="mt-5">CMS Content Overview</h3>
+    <div class="row">
+        {% for section in about_sections %}
+        <div class="col-md-12 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5>{{ section.title }}</h5>
+                    <p>{{ section.content|truncatewords:20 }}</p>
+                    <a href="{% url 'admin_panel:edit_about_section' section.pk %}" class="btn btn-primary">Edit</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h3 class="mt-5">Portal Settings</h3>
+    <div class="card">
+        <div class="card-body">
+            <p>Student Portal Active: {{ settings.student_portal_active|yesno:"Yes,No" }}</p>
+            <p>Instructor Portal Active: {{ settings.instructor_portal_active|yesno:"Yes,No" }}</p>
+            <p>Maintenance Message: {{ settings.maintenance_message|default:"None" }}</p>
+            <a href="{% url 'admin_panel:portal_settings' %}" class="btn btn-primary">Edit Settings</a>
+        </div>
+    </div>
+</section>
+<meta name="description" content="{{ meta_description }}">
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'student_portal/base.html' %}
+{% block title %}Semester{% endblock %}
+{% block header_title %}Semester{% endblock %}
+{% block content %}
+    <h3>Semester Information</h3>
+    {% if semester %}
+    <p>{{ semester.name }} ({{ semester.start_date }} - {{ semester.end_date }})</p>
+    {% else %}
+    <p>No current semester.</p>
+    {% endif %}
+{% endblock %}

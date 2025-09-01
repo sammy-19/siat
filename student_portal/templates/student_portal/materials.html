@@ -1,0 +1,40 @@
+{% extends 'student_portal/base.html' %}
+{% block title %}Materials{% endblock %}
+{% block header_title %}Learning Materials{% endblock %}
+{% block content %}
+    <h3>Learning Materials</h3>
+    <div class="row">
+        {% for type, materials in materials_by_type.items %}
+            {% if materials %}
+                <h4>{{ type|title }}s</h4>
+                {% for material in materials %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5>{{ material.title }} ({{ material.get_type_display }})</h5>
+                                <p>Created: {{ material.created_at|date:"F d, Y" }}</p>
+                                <a href="{{ material.get_file_url }}" 
+                                   {% if material.type == 'video' %} 
+                                       target="_blank" 
+                                   {% else %} 
+                                       download 
+                                   {% endif %} 
+                                   class="btn btn-primary">
+                                    <i class="material-icons">{% if material.type == 'video' %}play_arrow{% else %}download{% endif %}</i> 
+                                    {% if material.type == 'video' %}Watch{% else %}Download{% endif %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="alert alert-info">No {{ type|title }} materials available.</p>
+            {% endif %}
+        {% endfor %}
+        {% if materials_by_type.outline|length == 0 and materials_by_type.module|length == 0 and materials_by_type.video|length == 0 %}
+            <p class="alert alert-info">No learning materials available for your enrolled courses.</p>
+        {% endif %}
+    </div>
+    <meta name="description" content="SIAT Student Portal - Access course outlines, modules, and videos for applied sciences technology Zambia.">
+    <meta name="keywords" content="SIAT learning materials, sunrise institute courses Zambia, applied technology resources">
+{% endblock %}
