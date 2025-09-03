@@ -13,8 +13,12 @@ from cloudinary.utils import cloudinary_url
 
 logger = logging.getLogger(__name__)
 
-@login_required
+@login_required(login_url='/portal/login/')
 def dashboard(request):
+    if request.session.get("portal") != "student":
+        logout(request)
+        return redirect("student_portal:student_login")
+    
     profile = get_object_or_404(StudentProfile, user=request.user)
     enrollments = Enrollment.objects.filter(student=profile)
     overall_progress = enrollments.aggregate(avg_progress=models.Avg('progress'))['avg_progress'] or 0
@@ -34,7 +38,7 @@ def dashboard(request):
     }
     return render(request, 'student_portal/dashboard.html', context)
 
-@login_required
+@login_required(login_url='/portal/login/')
 def profile(request):
     profile = get_object_or_404(StudentProfile, user=request.user)
     if request.method == 'POST':
@@ -46,13 +50,13 @@ def profile(request):
         form = ProfileForm(instance=profile)
     return render(request, 'student_portal/profile.html', {'form': form, 'profile': profile})
 
-@login_required
+@login_required(login_url='/portal/login/')
 def courses(request):
     profile = get_object_or_404(StudentProfile, user=request.user)
     enrollments = Enrollment.objects.filter(student=profile)
     return render(request, 'student_portal/courses.html', {'enrollments': enrollments})
 
-@login_required
+@login_required(login_url='/portal/login/')
 def assignments(request):
     profile = get_object_or_404(StudentProfile, user=request.user)
     enrollments = Enrollment.objects.filter(student=profile)
@@ -69,8 +73,7 @@ def assignments(request):
         form = SubmissionForm()
     return render(request, 'student_portal/assignments.html', {'assignments': assignments, 'form': form})
 
-@login_required
-@login_required
+@login_required(login_url='/portal/login/')
 def download_pdf(request, assignment_id):
     assignment = get_object_or_404(Assignment, id=assignment_id)
     if not assignment.file_public_id:
@@ -85,7 +88,7 @@ def download_pdf(request, assignment_id):
     )
     return redirect(url)
 
-@login_required
+@login_required(login_url='/portal/login/')
 def materials(request):
     profile = get_object_or_404(StudentProfile, user=request.user)
     enrollments = Enrollment.objects.filter(student=profile)
@@ -110,7 +113,7 @@ def materials(request):
     }
     return render(request, 'student_portal/materials.html', context)
 
-@login_required
+@login_required(login_url='/portal/login/')
 def semester(request):
     current_semester = Semester.objects.filter(is_current=True).first()
     return render(request, 'student_portal/semester.html', {'semester': current_semester})
@@ -149,4 +152,4 @@ class AssignmentDetailView(DetailView):
 def student_logout(request):
     logout(request)
     messages.success(request, "Successfully logged out.")
-    return redirect('student_login')
+    return redirect('student_portal:student_login')

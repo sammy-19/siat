@@ -27,7 +27,7 @@
 <body>
     <div class="login-card">
         <h2 class="text-center mb-4" style="color: var(--primary-blue);">SIAT Admin CMS Login</h2>
-        <form method="post" action="{% url 'admin_login' %}">
+        <form method="post" action="{% url 'admin_panel:admin_login' %}">
             {% csrf_token %}
             <div class="mb-3">
                 <label for="id_username" class="form-label">Username</label>

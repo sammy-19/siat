@@ -195,3 +195,11 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SITE_NAME = 'Sunrise Institute of Applied Sciences and Technology'
 SITE_DESCRIPTION = 'SUNRISE INSTITUTE OF APPLIED SCIENCES AND TECHNOLOGY and its board value and embrace diversity, equality and inclusion as fundamental to our mission to educate students for career success within a context of global citizenship and social justice. We recognize that historical and persistent inequalities and barriers to equitable participation exist and are well documented in society and within the college.',
 SITE_URL = 'www.sunrise-institute.net'
+
+# Default
+SESSION_COOKIE_NAME = "siat_session"
+
+# Custom cookie names for apps
+STUDENT_SESSION_COOKIE_NAME = "siat_student_session"
+INSTRUCTOR_SESSION_COOKIE_NAME = "siat_instructor_session"
+ADMIN_SESSION_COOKIE_NAME = "siat_admin_session"

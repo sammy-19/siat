@@ -1,0 +1,98 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Manage Schools{% endblock %}
+{% block header_title %}Manage Schools & Students{% endblock %}
+
+{% block content %}
+<section class="py-4">
+  <div class="row">
+    <div class="col-md-5">
+      <div class="card mb-4">
+        <div class="card-header">Add a School</div>
+        <div class="card-body">
+          <form action="{% url 'admin_panel:add_school' %}" method="post">
+            {% csrf_token %}
+            {{ school_form.as_p }}
+            <button class="btn btn-primary">Add School</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Schools</div>
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead><tr><th>Name</th><th style="width:180px;">Actions</th></tr></thead>
+            <tbody>
+              {% for s in schools %}
+              <tr>
+                <td>{{ s.name }}</td>
+                <td>
+                  <a class="btn btn-sm btn-warning" href="{% url 'admin_panel:edit_school' s.pk %}">Edit</a>
+                  <form action="{% url 'admin_panel:delete_school' s.pk %}" method="post" style="display:inline-block">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this school?')">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="2" class="text-muted p-3">No schools yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7">
+      <div class="card">
+        <div class="card-header">Students</div>
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead>
+              <tr>
+                <th>Full name</th>
+                <th>Email</th>
+                <th>School</th>
+                <th style="width:240px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for student in students %}
+              <tr>
+                <td>{{ student.full_name }}</td>
+                <td>{{ student.email }}</td>
+                <td>{{ student.school.name|default:"—" }}</td>
+                <td>
+                  <!-- inline assign -->
+                  <form action="{% url 'admin_panel:manage_schools' %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="assign_student" value="1">
+                    <input type="hidden" name="student_id" value="{{ student.id }}">
+                    <select name="school_id" class="form-select form-select-sm d-inline-block" style="width: 150px;">
+                      <option value="">(none)</option>
+                      {% for s in schools %}
+                        <option value="{{ s.id }}" {% if student.school_id == s.id %}selected{% endif %}>{{ s.name }}</option>
+                      {% endfor %}
+                    </select>
+                    <button class="btn btn-sm btn-primary">Save</button>
+                  </form>
+
+                  <a class="btn btn-sm btn-outline-secondary" href="{% url 'admin_panel:edit_student' student.pk %}">Edit</a>
+                  <form action="{% url 'admin_panel:delete_student' student.pk %}" method="post" style="display:inline-block">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this student?')">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4" class="text-muted p-3">No students found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -2,11 +2,33 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.conf import settings
-from core.models import Course, EnrollmentApplication
+from core.models import Course, EnrollmentApplication, School, Department
 from student_portal.models import StudentProfile, Enrollment
 from instructor_portal.models import InstructorProfile
 from .models import *
 from datetime import datetime
+
+
+class SchoolForm(forms.ModelForm):
+    class Meta:
+        model = School
+        fields = ['name']
+
+class DepartmentForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = ['school', 'name']
+
+class StudentSchoolForm(forms.ModelForm):
+    class Meta:
+        model = StudentProfile
+        fields = ['school']
+
+class InstructorDepartmentForm(forms.ModelForm):
+    class Meta:
+        model = InstructorProfile
+        fields = ['department']
+
 
 class StudentRegistrationForm(forms.Form):
     application = forms.ModelChoiceField(queryset=EnrollmentApplication.objects.filter(status='pending'))
@@ -49,7 +71,7 @@ class InstructorRegistrationForm(forms.ModelForm):
     def save(self, commit=True):
         profile = super().save(commit=False)
         username = profile.email.split('@')[0]
-        password = User.objects.make_random_password()
+        password = "securepass123"
         user = User.objects.create_user(username=username, email=profile.email, password=password)
         profile.user = user
         if commit:

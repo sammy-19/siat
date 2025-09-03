@@ -1,9 +1,11 @@
 from django.urls import path
 from .views import dashboard, profile, courses, assignments, materials, student_logout, semester, download_pdf, CourseDetailView, AssignmentDetailView
+from .views_auth import StudentLoginView
 
 app_name = 'student_portal'
 
 urlpatterns = [
+    path('login/', StudentLoginView.as_view(), name='student_login'),
     path('', dashboard, name='dashboard'),
     path('profile/', profile, name='profile'),
     path('courses/', courses, name='courses'),

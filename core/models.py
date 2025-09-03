@@ -3,16 +3,21 @@ from cloudinary.models import CloudinaryField
 from django.utils.text import slugify
 
 
-# class AboutSection(models.Model):
-#     title = models.CharField(max_length=255)
-#     content = models.TextField()
-#     order = models.IntegerField(default=0)  # For sorting
+class School(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    def __str__(self): return self.name
 
-#     class Meta:
-#         ordering = ['order']
+    def __str__(self):
+        return self.name
 
-#     def __str__(self):
-#         return self.title
+class Department(models.Model):
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='departments')
+    name = models.CharField(max_length=255)
+    class Meta:
+        unique_together = ('school', 'name')
+        
+    def __str__(self):
+        return f"{self.school.name} - {self.name}"
 
 class Course(models.Model):
     CATEGORY_CHOICES = (

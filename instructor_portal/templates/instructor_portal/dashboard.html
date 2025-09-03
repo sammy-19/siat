@@ -10,7 +10,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5>{{ course.title }}</h5>
-                    <p>Enrolled Students: {{ num_enrolled }}</p>
+                    <p>Enrolled Students: {{ course.num_enrolled }}</p>
                     <a href="{% url 'instructor_portal:monitoring' %}" class="btn btn-primary">Monitor Students</a>
                     <a href="{% url 'instructor_portal:materials' %}" class="btn btn-primary mt-2">Upload Materials</a>
                     <a href="{% url 'instructor_portal:grading' %}" class="btn btn-primary mt-2">Manage Grades</a>

@@ -6,32 +6,32 @@ from cloudinary.uploader import upload
 from cloudinary.utils import cloudinary_url
 from django.contrib import messages
 from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 import logging
 
 
 logger = logging.getLogger(__name__)
 
-def is_instructor(user):
-    return user.groups.filter(name='Instructor').exists()
 
-@login_required
-@user_passes_test(is_instructor, login_url='/instructor_portal/login/')
+@login_required(login_url='/instructor/login/')
 def dashboard(request):
+    if request.session.get("portal") != "instructor":
+        logout(request)
+        return redirect("instructor_portal:instructor_login")
+    
     profile = get_object_or_404(InstructorProfile, user=request.user)
-    courses = profile.courses_taught.all()
-    for course in courses:
-        enrollments = Enrollment.objects.filter(course=course)
-        num_enrolled = enrollments.count()
+    
+    courses = profile.courses_taught.annotate(num_enrolled=Count('enrollment'))
+    
     context = {
         'profile': profile,
         'courses': courses,
-        'num_enrolled': num_enrolled,
         'meta_description': 'SIAT Instructor Portal Dashboard - Manage materials, assignments, and students.',
     }
     return render(request, 'instructor_portal/dashboard.html', context)
 
-@login_required
+@login_required(login_url='/instructor/login/')
 def materials(request):
     profile = get_object_or_404(InstructorProfile, user=request.user)
     courses = profile.courses_taught.all()
@@ -70,7 +70,7 @@ def materials(request):
     }
     return render(request, 'instructor_portal/materials.html', context)
 
-@login_required
+@login_required(login_url='/instructor/login/')
 def assignments(request):
     profile = get_object_or_404(InstructorProfile, user=request.user)
     courses = profile.courses_taught.all()
@@ -97,14 +97,7 @@ def assignments(request):
             logger.error(f"Assignment creation failed: {str(e)}")
             messages.error(request, f"Failed to create assignment: {str(e)}")
         return redirect('instructor_portal:assignments')
-    # In views.py, assignments view
-    # try:
-    #     if file:
-    #         # upload_result = upload(file, resource_type='raw', public_id=f'assignments/{title}_{course.id}')
-    #         assignment_data['file'] = upload_result.get('secure_url')
-    # except Exception as e:
-    #     logger.error(f"Cloudinary upload failed: {str(e)}")
-    #     messages.error(request, f"Upload failed: {str(e)}")
+
     context = {
         'courses': courses,
         'assignments': assignments,
@@ -112,7 +105,7 @@ def assignments(request):
     }
     return render(request, 'instructor_portal/assignments.html', context)
 
-@login_required
+@login_required(login_url='/instructor/login/')
 def download_pdf(request, assignment_id):
     assignment = get_object_or_404(Assignment, id=assignment_id)
     if not assignment.file_public_id:
@@ -127,7 +120,7 @@ def download_pdf(request, assignment_id):
     )
     return redirect(url)
 
-@login_required
+@login_required(login_url='/instructor/login/')
 def submissions(request):
     profile = get_object_or_404(InstructorProfile, user=request.user)
     courses = profile.courses_taught.all()
@@ -185,4 +178,4 @@ def monitoring(request):
 def instructor_logout(request):
     logout(request)
     messages.success(request, "Successfully logged out.")
-    return redirect('instructor_login')
+    return redirect('instructor_portal:instructor_login')

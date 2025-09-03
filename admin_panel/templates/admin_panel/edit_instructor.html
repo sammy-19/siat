@@ -1,0 +1,30 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Edit Instructor{% endblock %}
+{% block header_title %}Edit Instructor - {{ instructor.full_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-8">
+                <h5>Profile</h5>
+                {{ form.as_p }}
+            </div>
+            <div class="col-md-4">
+                <h5>Department</h5>
+                {{ dept_form.as_p }}
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a href="{% url 'admin_panel:manage_instructors' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

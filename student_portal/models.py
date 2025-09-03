@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from cloudinary.models import CloudinaryField
-from core.models import Course
+from core.models import Course, School
 import datetime
 
 
@@ -12,6 +12,7 @@ class StudentProfile(models.Model):
     phone = models.CharField(max_length=20)
     profile_pic = CloudinaryField('profile_pic', blank=True)  # Upload via Cloudinary
     student_number = models.CharField(max_length=50, blank=True, unique=True)
+    school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True, blank=True, related_name='students')
 
     def save(self, *args, **kwargs):
         if not self.student_number:

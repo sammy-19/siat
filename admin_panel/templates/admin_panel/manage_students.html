@@ -1,0 +1,47 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Manage Students{% endblock %}
+{% block header_title %}Manage Students{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h3>All Students</h3>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Student No.</th>
+                <th>School</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ student.full_name }}</td>
+                <td>{{ student.email }}</td>
+                <td>{{ student.phone }}</td>
+                <td>{{ student.student_number }}</td>
+                <td>
+                    {% if student.school %}
+                        {{ student.school.name }}
+                    {% else %}
+                        <center>&mdash;</center>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'admin_panel:edit_student' student.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'admin_panel:delete_student' student.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">No students found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

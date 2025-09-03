@@ -9,7 +9,7 @@
         <div class="card mt-3">
             <div class="card-body">
                 <h5>{{ course.title }}</h5>
-                {% for enrollment in enrollments|dictsort:"course_id" %}
+                {% for enrollment in course.enrollment_set.all %}
                     <p>{{ enrollment.student.full_name }} - Progress: {{ enrollment.progress }}%</p>
                     <div class="progress">
                         <div class="progress-bar" style="width: {{ enrollment.progress }}%; background-color: var(--accent-orange);"></div>

@@ -1,0 +1,105 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Manage Departments{% endblock %}
+{% block header_title %}Manage Departments & Instructors{% endblock %}
+
+{% block content %}
+<section class="py-4">
+  <div class="row">
+    <div class="col-md-5">
+      <div class="card mb-4">
+        <div class="card-header">Add a Department</div>
+        <div class="card-body">
+          <form action="{% url 'admin_panel:add_department' %}" method="post">
+            {% csrf_token %}
+            {{ department_form.as_p }}
+            <button class="btn btn-primary">Add Department</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">Departments</div>
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead><tr><th>Department</th><th>School</th><th style="width:180px;">Actions</th></tr></thead>
+            <tbody>
+              {% for d in departments %}
+              <tr>
+                <td>{{ d.name }}</td>
+                <td>{{ d.school.name }}</td>
+                <td>
+                  <a class="btn btn-sm btn-warning" href="{% url 'admin_panel:edit_department' d.pk %}">Edit</a>
+                  <form action="{% url 'admin_panel:delete_department' d.pk %}" method="post" style="display:inline-block">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this department?')">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="3" class="text-muted p-3">No departments yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-7">
+      <div class="card">
+        <div class="card-header">Instructors</div>
+        <div class="card-body p-0">
+          <table class="table mb-0">
+            <thead>
+              <tr>
+                <th>Full name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th style="width:260px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for instructor in instructors %}
+              <tr>
+                <td>{{ instructor.full_name }}</td>
+                <td>{{ instructor.email }}</td>
+                <td>
+                  {% if instructor.department %}
+                    {{ instructor.department.name }} ({{ instructor.department.school.name }})
+                  {% else %} — {% endif %}
+                </td>
+                <td>
+                  <!-- inline assign -->
+                  <form action="{% url 'admin_panel:manage_departments' %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="assign_instructor" value="1">
+                    <input type="hidden" name="instructor_id" value="{{ instructor.id }}">
+                    <select name="department_id" class="form-select form-select-sm d-inline-block" style="width: 170px;">
+                      <option value="">(none)</option>
+                      {% for d in departments %}
+                        <option value="{{ d.id }}" {% if instructor.department_id == d.id %}selected{% endif %}>
+                          {{ d.school.name }} - {{ d.name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                    <button class="btn btn-sm btn-primary">Save</button>
+                  </form>
+
+                  <a class="btn btn-sm btn-outline-secondary" href="{% url 'admin_panel:edit_instructor' instructor.pk %}">Edit</a>
+                  <form action="{% url 'admin_panel:delete_instructor' instructor.pk %}" method="post" style="display:inline-block">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this instructor?')">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="4" class="text-muted p-3">No instructors found.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}

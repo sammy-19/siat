@@ -12,16 +12,31 @@
                     <h5>{{ student.full_name }}</h5>
                     <p>Email: {{ student.email }}</p>
                     <p>Student Number: {{ student.student_number }}</p>
-                    <p>Courses: {% for enrollment in student.enrollment_set.all %}{{ enrollment.course.title }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                    <p>Courses: 
+                    {% for enrollment in student.enrollment_set.all %}
+                        {{ enrollment.course.title }} ({{ enrollment.progress }}%)
+                        {% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                    </p>
                     <div class="progress">
-                        <div class="progress-bar" style="width: 30%;"></div>
+                    {% for enrollment in student.enrollment_set.all %}
+                        <div class="progress-bar" role="progressbar" 
+                            style="width: {{ enrollment.progress }}%;" 
+                            aria-valuenow="{{ enrollment.progress }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ enrollment.progress }}%
+                        </div>
+                    {% empty %}
+                        <span>No course enrollment yet.</span>
+                    {% endfor %}
                     </div>
                 </div>
+                <a href="{% url 'admin_panel:edit_student' student.pk %}" class="btn btn-sm btn-warning">Edit</a>
             </div>
         </div>
         {% empty %}
         <p class="alert alert-danger">No students registered yet.</p>
         {% endfor %}
+        <a href="{% url 'admin_panel:manage_students' %}" class="btn btn-link mt-2">See all students</a>
     </div>
 
     <h3 class="mt-5">Instructor Overview</h3>
@@ -34,11 +49,13 @@
                     <p>Email: {{ instructor.email }}</p>
                     <p>Courses: {% for course in instructor.courses_taught.all %}{{ course.title }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
                 </div>
+                <a href="{% url 'admin_panel:edit_instructor' instructor.pk %}" class="btn btn-sm btn-warning">Edit</a>
             </div>
         </div>
         {% empty %}
         <p class="alert alert-danger">No instructors registered yet.</p>
         {% endfor %}
+        <a href="{% url 'admin_panel:manage_instructors' %}" class="btn btn-link mt-2">See all instructors</a>
     </div>
 
     <h3 class="mt-5">CMS Content Overview</h3>
