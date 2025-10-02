@@ -7,8 +7,12 @@ from cloudinary.utils import cloudinary_url
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count, Avg
 import logging
+
+
+MAX_UPLOAD_SIZE_MB = 4.5
+MAX_UPLOAD_SIZE = MAX_UPLOAD_SIZE_MB * 1024 * 1024
 
 
 logger = logging.getLogger(__name__)
@@ -22,11 +26,20 @@ def dashboard(request):
     
     profile = get_object_or_404(InstructorProfile, user=request.user)
     
-    courses = profile.courses_taught.annotate(num_enrolled=Count('enrollment'))
-    
+    courses = profile.courses_taught.annotate(
+        num_enrolled=Count('enrollment'),
+        avg_score=Avg('assignment__submission__score')
+    )
+
+    # Get 3 latest submissions for a quick view
+    latest_submissions = Submission.objects.filter(
+        assignment__course__in=courses
+    ).select_related('student', 'assignment').order_by('-submitted_at')[:3]
+
     context = {
         'profile': profile,
         'courses': courses,
+        'latest_submissions': latest_submissions,
         'meta_description': 'SIAT Instructor Portal Dashboard - Manage materials, assignments, and students.',
     }
     return render(request, 'instructor_portal/dashboard.html', context)
@@ -35,40 +48,50 @@ def dashboard(request):
 def materials(request):
     profile = get_object_or_404(InstructorProfile, user=request.user)
     courses = profile.courses_taught.all()
+
     if request.method == 'POST':
         course_id = request.POST.get('course_id')
         course = get_object_or_404(Course, id=course_id)
         title = request.POST.get('title')
-        file = request.FILES.get('file')
         material_type = request.POST.get('type', 'module')
-        if not title or not file:
-            messages.error(request, "Title and file are required.")
-            return render(request, 'instructor_portal/materials.html', {'courses': courses})
-        allowed_types = ['application/pdf', 'video/mp4']
-        if file.content_type not in allowed_types:
-            messages.error(request, "Only PDF and MP4 files are allowed.")
-            return render(request, 'instructor_portal/materials.html', {'courses': courses})
-        try:
-            upload_result = upload(file, resource_type='auto')
-            material_url = upload_result.get('secure_url')
+
+        file = request.FILES.get('file')
+        video_url = request.POST.get('video_url')
+
+        if not title:
+            messages.error(request, "Title is required.")
+            return redirect('instructor_portal:materials')
+
+        if material_type == 'video':
+            if not video_url:
+                messages.error(request, "Please provide a YouTube link for video materials.")
+                return redirect('instructor_portal:materials')
             LearningMaterial.objects.create(
-                course=course,
-                title=title,
-                file=material_url,
-                type=material_type
+                course=course, title=title, type='video', video_url=video_url
+            )
+            messages.success(request, "Video link saved successfully.")
+        else:
+            if not file:
+                messages.error(request, "Please upload a PDF file.")
+                return redirect('instructor_portal:materials')
+
+            if file.size > MAX_UPLOAD_SIZE:
+                messages.error(request, f"File too large. Max allowed is {MAX_UPLOAD_SIZE_MB}MB. Your file: {file.size/1024/1024:.2f}MB")
+                return redirect('instructor_portal:materials')
+
+            upload_result = upload(file, resource_type='raw')
+            LearningMaterial.objects.create(
+                course=course, title=title, type=material_type, file=upload_result.get('secure_url')
             )
             messages.success(request, "Material uploaded successfully.")
-        except Exception as e:
-            logger.error(f"Upload failed: {str(e)}")
-            messages.error(request, f"Failed to upload material: {str(e)}")
+
         return redirect('instructor_portal:materials')
+
     materials = LearningMaterial.objects.filter(course__in=courses).order_by('-created_at')
-    context = {
+    return render(request, 'instructor_portal/materials.html', {
         'courses': courses,
-        'materials': materials,
-        'meta_description': 'SIAT Instructor Portal - Manage course materials like PDFs and videos.',
-    }
-    return render(request, 'instructor_portal/materials.html', context)
+        'materials': materials
+    })
 
 @login_required(login_url='/instructor/login/')
 def assignments(request):
@@ -88,6 +111,10 @@ def assignments(request):
         try:
             assignment_data = {'course': course, 'title': title, 'description': description, 'due_date': due_date}
             if file:
+                if file and file.size > MAX_UPLOAD_SIZE:
+                    messages.error(request, f"File too large. Max allowed is {MAX_UPLOAD_SIZE_MB}MB. Your file: {file.size/1024/1024:.2f}MB")
+                    return redirect('instructor_portal:assignments')
+                
                 upload_result = upload(file, resource_type='raw')
                 assignment_data['file'] = upload_result.get('secure_url')
                 assignment_data['file_public_id'] = upload_result.get('public_id')
@@ -127,11 +154,15 @@ def submissions(request):
     if request.method == 'POST':
         submission_id = request.POST.get('submission_id')
         grade = request.POST.get('grade')
-        if submission_id and grade:
+        score = request.POST.get('score')
+        if submission_id:
             submission = get_object_or_404(Submission, id=submission_id)
-            submission.grade = grade
+            if grade:
+                submission.grade = grade
+            if score:
+                submission.score = int(score)
             submission.save()
-            messages.success(request, "Grade updated successfully.")
+            messages.success(request, "Submission updated successfully.")
         return redirect('instructor_portal:submissions')
     submissions = Submission.objects.filter(assignment__course__in=courses).order_by('-submitted_at')
     context = {
@@ -174,6 +205,13 @@ def monitoring(request):
         'meta_description': 'SIAT Instructor Portal - Monitor student progress in taught courses.',
     }
     return render(request, 'instructor_portal/monitoring.html', context)
+
+@login_required(login_url='/instructor/login/')
+def delete_assignment(request, pk):
+    assignment = get_object_or_404(Assignment, pk=pk)
+    assignment.delete()
+    messages.success(request, "Assignment deleted successfully.")
+    return redirect('instructor_portal:assignments')
 
 def instructor_logout(request):
     logout(request)

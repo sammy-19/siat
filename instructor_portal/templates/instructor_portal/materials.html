@@ -27,16 +27,30 @@
         </div>
         <div class="mb-3">
             <label for="type" class="form-label">Material Type</label>
-            <select name="type" class="form-control" required>
+            <select name="type" id="materialType" class="form-control" required onchange="toggleInputs()">
                 <option value="outline">Course Outline</option>
                 <option value="module">Module</option>
                 <option value="video">Video</option>
             </select>
         </div>
-        <div class="mb-3">
-            <label for="file" class="form-label">File (PDF/Video)</label>
-            <input type="file" name="file" class="form-control" required accept=".pdf,.mp4">
+
+        <div class="mb-3" id="fileInput">
+            <label for="file" class="form-label">File (PDF only)</label>
+            <input type="file" name="file" class="form-control" accept=".pdf">
         </div>
+
+        <div class="mb-3 d-none" id="videoInput">
+            <label for="video_url" class="form-label">YouTube Link</label>
+            <input type="url" name="video_url" class="form-control" placeholder="https://youtube.com/watch?v=...">
+        </div>
+
+        <script>
+            function toggleInputs() {
+                const type = document.getElementById("materialType").value;
+                document.getElementById("fileInput").classList.toggle("d-none", type === "video");
+                document.getElementById("videoInput").classList.toggle("d-none", type !== "video");
+            }
+        </script>
         <button type="submit" class="btn btn-primary">Upload</button>
     </form>
 
@@ -51,7 +65,14 @@
                     <div class="card-body">
                         <h5>{{ material.title }} ({{ material.get_type_display }})</h5>
                         <p>Uploaded: {{ material.created_at|date:"F d, Y" }}</p>
-                        <a href="{{ material.file.url }}" download class="btn btn-primary">Download</a>
+                        {% if material.type == 'video' and material.video_url %}
+                            <iframe width="560" height="315"
+                                    src="{{ material.get_embed_url }}"
+                                    frameborder="0" allowfullscreen>
+                            </iframe>
+                        {% elif material.file %}
+                            <a href="{{ material.file.url }}" class="btn btn-primary" download>Download</a>
+                        {% endif %}
                         <a href="{% url 'instructor_portal:materials' %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                     </div>
                 {% empty %}

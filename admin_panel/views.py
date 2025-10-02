@@ -9,8 +9,8 @@ from instructor_portal.models import InstructorProfile
 from core.models import School, Department
 from .forms import (
     SchoolForm, DepartmentForm,
-    StudentSchoolForm, InstructorDepartmentForm,
-    StudentRegistrationForm, InstructorRegistrationForm,
+    StudentSchoolForm, InstructorDepartmentForm, InstructorEditForm,
+    StudentRegistrationForm, StudentEditForm, InstructorRegistrationForm,
     AboutSectionForm, PortalSettingsForm
 )
 
@@ -101,25 +101,21 @@ def manage_students(request):
     students = StudentProfile.objects.select_related('school').all().order_by('full_name')
     return render(request, 'admin_panel/manage_students.html', {'students': students})
 
-@login_required(login_url='/admin_panel/login/')
-def edit_student(request, pk):
-    student = get_object_or_404(StudentProfile, pk=pk)
-    if request.method == 'POST':
-        form = StudentRegistrationForm(request.POST, instance=student)
-        school_form = StudentSchoolForm(request.POST, instance=student)
-        if form.is_valid() and school_form.is_valid():
+@login_required
+def edit_student(request, student_id):
+    student = get_object_or_404(StudentProfile, pk=student_id)
+
+    if request.method == "POST":
+        form = StudentEditForm(request.POST, request.FILES, instance=student)
+        if form.is_valid():
             form.save()
-            school_form.save()
-            messages.success(request, "Student updated.")
-            return redirect('admin_panel:dashboard')
+            messages.success(request, "Student updated successfully.")
+            return redirect("admin_panel:manage_students")
     else:
-        form = StudentRegistrationForm(instance=student)
-        school_form = StudentSchoolForm(instance=student)
-    return render(request, 'admin_panel/edit_student.html', {
-        'form': form,
-        'school_form': school_form,
-        'student': student
-    })
+        form = StudentEditForm(instance=student)
+
+    return render(request, "admin_panel/edit_student.html", {"form": form, "student": student})
+
 
 @login_required(login_url='/admin_panel/login/')
 def delete_student(request, pk):
@@ -139,17 +135,20 @@ def manage_instructors(request):
 @login_required(login_url='/admin_panel/login/')
 def edit_instructor(request, pk):
     instructor = get_object_or_404(InstructorProfile, pk=pk)
+
     if request.method == 'POST':
-        form = InstructorRegistrationForm(request.POST, request.FILES, instance=instructor)
+        form = InstructorEditForm(request.POST, request.FILES, instance=instructor)
         dept_form = InstructorDepartmentForm(request.POST, instance=instructor)
+
         if form.is_valid() and dept_form.is_valid():
             form.save()
             dept_form.save()
             messages.success(request, "Instructor updated.")
-            return redirect('admin_panel:dashboard')
+            return redirect('admin_panel:manage_instructors')
     else:
-        form = InstructorRegistrationForm(instance=instructor)
+        form = InstructorEditForm(instance=instructor)
         dept_form = InstructorDepartmentForm(instance=instructor)
+
     return render(request, 'admin_panel/edit_instructor.html', {
         'form': form,
         'dept_form': dept_form,

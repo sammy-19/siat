@@ -16,7 +16,7 @@ urlpatterns = [
     ,
     # Students
     path('students/', views.manage_students, name='manage_students'),
-    path('students/<int:pk>/edit/', views.edit_student, name='edit_student'),
+    path('students/<int:student_id>/edit/', views.edit_student, name='edit_student'),
     path('students/<int:pk>/delete/', views.delete_student, name='delete_student'),
 
     # Instructors

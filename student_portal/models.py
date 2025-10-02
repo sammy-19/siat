@@ -52,19 +52,31 @@ class Submission(models.Model):
     file = CloudinaryField('file', resource_type='raw')  # Word/PDF upload
     submitted_at = models.DateTimeField(auto_now_add=True)
     grade = models.CharField(max_length=2, blank=True)
+    score = models.PositiveIntegerField(null=True, blank=True, help_text="Score out of 100")
 
 class LearningMaterial(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
-    file = CloudinaryField('file', resource_type='raw')  # PDF/module/video
+    file = CloudinaryField('file', resource_type='raw')  # PDF/module
+    video_url = models.URLField(blank=True, null=True, help_text="Paste a YouTube link for videos")
     type = models.CharField(max_length=20, choices=(('outline', 'Course Outline'), ('module', 'Module'), ('video', 'Video')))
     created_at = models.DateTimeField(auto_now_add=True)
     
-    def get_file_url(self):
-        # Optional: Add Cloudinary transformation for PDF preview if needed
-        if self.type == 'video':
+    def get_display_url(self):
+        """Return the correct URL based on file type"""
+        if self.type == 'video' and self.video_url:
+            return self.get_embed_url()
+        elif self.file:
             return self.file.url
-        return f"{self.file.url}?download=1"
+        return None
+
+    def get_embed_url(self):
+        """Convert YouTube link to embeddable format"""
+        if not self.video_url:
+            return None
+        if "watch?v=" in self.video_url:
+            return self.video_url.replace("watch?v=", "embed/")
+        return self.video_url
 
 class NotificationPreference(models.Model):
     student = models.OneToOneField(StudentProfile, on_delete=models.CASCADE)

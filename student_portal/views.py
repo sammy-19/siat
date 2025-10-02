@@ -21,20 +21,44 @@ def dashboard(request):
     
     profile = get_object_or_404(StudentProfile, user=request.user)
     enrollments = Enrollment.objects.filter(student=profile)
+
+    # Attach avg_score to each enrollment
+    course_labels = []
+    avg_scores = []
+    for enrollment in enrollments:
+        avg_score = (
+            Submission.objects.filter(
+                assignment__course=enrollment.course,
+                student=profile
+            ).aggregate(avg=models.Avg("score"))["avg"]
+        )
+        enrollment.avg_score = round(avg_score, 2) if avg_score is not None else None
+
+        course_labels.append(enrollment.course.title)
+        avg_scores.append(enrollment.avg_score or 0)
+
     overall_progress = enrollments.aggregate(avg_progress=models.Avg('progress'))['avg_progress'] or 0
     notification_pref = NotificationPreference.objects.get_or_create(student=profile)[0]
     if request.GET.get('toggle_notifications'):
         notification_pref.enabled = not notification_pref.enabled
         notification_pref.save()
         return redirect('student_portal:dashboard')
+
     announcements = Announcement.objects.filter(course__in=[e.course for e in enrollments]).order_by('-created_at')[:5]
+
+    # Overall average score
+    overall_avg_score = sum(avg_scores) / len(avg_scores) if avg_scores else 0
+
     context = {
         'profile': profile,
         'enrollments': enrollments,
         'overall_progress': overall_progress,
+        'avg_score': overall_avg_score,
+        'course_labels': course_labels,
+        'avg_scores': avg_scores,
         'notification_pref': notification_pref,
         'announcements': announcements,
-        'meta_description': 'SIAT Student Portal Dashboard - Track progress, grades, and notifications.',
+        'meta_description': 'SIAT Student Portal Dashboard - Track progress, grades, scores, and notifications.',
     }
     return render(request, 'student_portal/dashboard.html', context)
 

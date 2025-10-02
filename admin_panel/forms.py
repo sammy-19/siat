@@ -60,6 +60,11 @@ class StudentRegistrationForm(forms.Form):
             [app.email]
         )
         return profile
+    
+class StudentEditForm(forms.ModelForm):
+    class Meta:
+        model = StudentProfile
+        fields = ['full_name', 'email', 'phone', 'profile_pic', 'school']
 
 class InstructorRegistrationForm(forms.ModelForm):
     courses = forms.ModelMultipleChoiceField(queryset=Course.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
@@ -83,6 +88,33 @@ class InstructorRegistrationForm(forms.ModelForm):
             settings.DEFAULT_FROM_EMAIL,
             [profile.email]
         )
+        return profile
+
+class InstructorEditForm(forms.ModelForm):
+    courses = forms.ModelMultipleChoiceField(
+        queryset=Course.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    class Meta:
+        model = InstructorProfile
+        fields = ('full_name', 'email', 'phone', 'profile_pic', 'department')
+
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+
+        # Update linked user instead of creating a new one
+        user = profile.user
+        user.email = profile.email
+        user.first_name = profile.full_name.split(" ")[0]
+        user.last_name = " ".join(profile.full_name.split(" ")[1:])
+        user.save()
+
+        if commit:
+            profile.save()
+            self.save_m2m()
+
         return profile
 
 class AboutSectionForm(forms.ModelForm):

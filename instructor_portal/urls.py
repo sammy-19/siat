@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import dashboard, materials, assignments, submissions, grading, monitoring, instructor_logout, download_pdf
+from .views import dashboard, materials, assignments, submissions, grading, monitoring, instructor_logout, download_pdf, delete_assignment
 from .views_auth import InstructorLoginView
 
 app_name = 'instructor_portal'
@@ -13,4 +13,5 @@ urlpatterns = [
     path('monitoring/', monitoring, name='monitoring'),
     path('logout/', instructor_logout, name='instructor_logout'),
     path('download/<int:assignment_id>/', download_pdf, name='download_pdf'),
+    path('assignments/delete/<int:pk>/', delete_assignment, name='delete_assignment'),
 ]

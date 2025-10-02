@@ -20,6 +20,8 @@
                 <form method="post" style="display:inline;">
                     {% csrf_token %}
                     <input type="hidden" name="submission_id" value="{{ submission.id }}">
+                    <input type="number" name="score" min="0" max="100" value="{{ submission.score }}" class="form-control">
+                    <button type="submit" class="btn btn-success btn-sm">Save Score</button>
                     <input type="text" name="grade" value="{{ submission.grade }}" class="form-control d-inline" style="width: 60px;" placeholder="Grade">
                     <button type="submit" class="btn btn-success">Save Grade</button>
                 </form>

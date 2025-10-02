@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-59mf_-3(6*i735h6@$cger@f@#gp#3lbja$ey9xn$!nr)&@nsk'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['www.sunrise-institute.net','sunrise-institute.net','.vercel.app','now.sh','127.0.0.1']
 
@@ -110,7 +110,7 @@ DATABASES = {
         'NAME': os.getenv('NEON_DB_NAME', 'neondb'),
         'USER': os.getenv('NEON_DB_USER', 'neondb_owner'),
         'PASSWORD': os.getenv('NEON_DB_PASSWORD', 'npg_D3pEQKdI5bNk'),
-        'HOST': os.getenv('NEON_DB_HOST', 'ep-cool-hill-ad09ewm9-pooler.c-2.us-east-1.aws.neon.tech'),  # e.g., your-project.neon.tech
+        'HOST': os.getenv('NEON_DB_HOST', 'ep-cool-hill-ad09ewm9-pooler.c-2.us-east-1.aws.neon.tech'),
         'PORT': os.getenv('NEON_DB_PORT', '5432'),
         'OPTIONS': {'sslmode': 'require'},  # Neon requires SSL
     }
@@ -180,7 +180,7 @@ cloudinary.config(
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGOUT_REDIRECT_URL = '/login/'
+# LOGOUT_REDIRECT_URL = '/login/'
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Dev; change to 'smtp' for prod

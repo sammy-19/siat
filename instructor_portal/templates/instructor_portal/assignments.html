@@ -52,6 +52,11 @@
                 {% else %}
                     <p class="alert alert-warning">No file attached for this assignment.</p>
                 {% endif %}
+                <a href="{% url 'instructor_portal:delete_assignment' assignment.id %}" 
+                    class="btn btn-danger"
+                    onclick="return confirm('Are you sure you want to delete this assignment?');">
+                    Delete
+                </a>
             </div>
         </div>
     {% empty %}
