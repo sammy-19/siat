@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-    <h3>Your Courses</h3>
+    <h3>Students' Overview</h3>
     <div class="progress mb-3">
         <div class="progress-bar" style="width: {{ overall_progress }}%;"></div>
     </div>
@@ -20,6 +20,29 @@
             <canvas id="scoreChart" height="120"></canvas>
         </div>
     </div>
+
+    <h3>Subjects for {{ semester.name }}</h3>
+
+    {% if course_subjects %}
+    <div class="row">
+        {% for cs in course_subjects %}
+        <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5>{{ cs.subject.title }}</h5>
+                    <p><strong>Course:</strong> {{ cs.course.title }}</p>
+                    <p><strong>Instructor:</strong> {{ cs.instructor.get_full_name|default:"TBA" }}</p>
+                    <p><strong>Status:</strong> {% if cs.is_active %} Active {% else %} Inactive {% endif %}</p>
+                    <a href="{% url 'student_portal:subject_detail' cs.subject.id %}" 
+                    class="btn btn-sm btn-primary">View Subject</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No subjects assigned for this semester.</p>
+    {% endif %}
 
     <div class="row">
         {% for enrollment in enrollments %}

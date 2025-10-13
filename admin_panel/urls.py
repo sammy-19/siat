@@ -35,4 +35,11 @@ urlpatterns = [
     path('departments/add/', views.add_department, name='add_department'),
     path('departments/<int:pk>/edit/', views.edit_department, name='edit_department'),
     path('departments/<int:pk>/delete/', views.delete_department, name='delete_department'),
+    
+    # Subjects
+    path('subjects/', views.manage_subjects, name='manage_subjects'),
+    path('subjects/add/', views.add_subject, name='add_subject'),
+    path('subjects/edit/<int:pk>/', views.edit_subject, name='edit_subject'),
+    path('subjects/delete/<int:pk>/', views.delete_subject, name='delete_subject'),
+    path('assign_subject/<int:subject_id>/', views.assign_subject_to_courses, name='assign_subject_to_courses'),
 ]

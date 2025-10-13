@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import dashboard, profile, courses, assignments, materials, student_logout, semester, download_pdf, CourseDetailView, AssignmentDetailView
+from .views import *
 from .views_auth import StudentLoginView
 
 app_name = 'student_portal'
@@ -11,6 +11,7 @@ urlpatterns = [
     path('courses/', courses, name='courses'),
     path('assignments/', assignments, name='assignments'),
     path('materials/', materials, name='materials'),
+    path("subject/<int:pk>/", subject_detail, name="subject_detail"),
     path('semester/', semester, name='semester'),
     path('course/<int:pk>/', CourseDetailView.as_view(), name='course_detail'),
     path('assignment/<int:pk>/', AssignmentDetailView.as_view(), name='assignment_detail'),

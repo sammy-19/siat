@@ -3,10 +3,21 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.conf import settings
 from core.models import Course, EnrollmentApplication, School, Department
-from student_portal.models import StudentProfile, Enrollment
+from student_portal.models import StudentProfile, Enrollment, Subject
 from instructor_portal.models import InstructorProfile
 from .models import *
 from datetime import datetime
+
+
+class SubjectForm(forms.ModelForm):
+    class Meta:
+        model = Subject
+        fields = ['title', 'code', 'description']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter subject name'}),
+            'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter subject code'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter brief description'}),
+        }
 
 
 class SchoolForm(forms.ModelForm):
@@ -67,24 +78,42 @@ class StudentEditForm(forms.ModelForm):
         fields = ['full_name', 'email', 'phone', 'profile_pic', 'school']
 
 class InstructorRegistrationForm(forms.ModelForm):
-    courses = forms.ModelMultipleChoiceField(queryset=Course.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
+    courses = forms.ModelMultipleChoiceField(
+        queryset=Course.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label="Courses Taught"
+    )
 
     class Meta:
         model = InstructorProfile
-        fields = ('full_name', 'email', 'phone', 'profile_pic')
+        fields = ('full_name', 'email', 'phone', 'profile_pic', 'department')
 
     def save(self, commit=True):
         profile = super().save(commit=False)
         username = profile.email.split('@')[0]
         password = "securepass123"
+
+        # Create linked user
         user = User.objects.create_user(username=username, email=profile.email, password=password)
         profile.user = user
+
         if commit:
             profile.save()
+            # Assign selected courses
+            selected_courses = self.cleaned_data.get('courses')
+            if selected_courses:
+                profile.courses_taught.set(selected_courses)
             self.save_m2m()
+
+        # Send login info via email
         send_mail(
             'Your SIAT Instructor Account is Ready',
-            f"Dear {profile.full_name},\nUsername: {username}\nInitial Password: {password} (change on first login)\nLog in at /instructor/login/",
+            f"Dear {profile.full_name},\n\n"
+            f"Username: {username}\n"
+            f"Initial Password: {password} (please change it after first login)\n"
+            f"Log in at /instructor/login/\n\n"
+            "Best regards,\nSIAT Admin",
             settings.DEFAULT_FROM_EMAIL,
             [profile.email]
         )
@@ -94,17 +123,24 @@ class InstructorEditForm(forms.ModelForm):
     courses = forms.ModelMultipleChoiceField(
         queryset=Course.objects.all(),
         widget=forms.CheckboxSelectMultiple,
-        required=False
+        required=False,
+        label="Courses Taught"
     )
 
     class Meta:
         model = InstructorProfile
-        fields = ('full_name', 'email', 'phone', 'profile_pic', 'department')
+        fields = ('full_name', 'email', 'phone', 'profile_pic', 'department', 'courses')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Pre-select current courses if editing an existing instructor
+        if self.instance and self.instance.pk:
+            self.fields['courses'].initial = self.instance.courses_taught.all()
 
     def save(self, commit=True):
         profile = super().save(commit=False)
 
-        # Update linked user instead of creating a new one
+        # Update linked user details
         user = profile.user
         user.email = profile.email
         user.first_name = profile.full_name.split(" ")[0]
@@ -113,9 +149,15 @@ class InstructorEditForm(forms.ModelForm):
 
         if commit:
             profile.save()
+
+            # Update selected courses
+            selected_courses = self.cleaned_data.get('courses')
+            if selected_courses is not None:
+                profile.courses_taught.set(selected_courses)
             self.save_m2m()
 
         return profile
+
 
 class AboutSectionForm(forms.ModelForm):
     class Meta:

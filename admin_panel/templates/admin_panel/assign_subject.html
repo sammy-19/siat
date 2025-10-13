@@ -1,0 +1,64 @@
+{% extends 'admin_panel/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Assign Subject: {{ subject.title }}</h3>
+    <hr>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Select Courses:</label><br>
+            {% for course in courses %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="courses" value="{{ course.id }}" id="course{{ forloop.counter }}">
+                    <label class="form-check-label" for="course{{ forloop.counter }}">{{ course.title }}</label>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            <label for="semester" class="form-label">Select Semester:</label>
+            <select name="semester" id="semester" class="form-select" required>
+                <option value="">-- Choose Semester --</option>
+                {% for sem in semesters %}
+                    <option value="{{ sem.id }}">{{ sem.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success">Assign</button>
+        <a href="{% url 'admin_panel:manage_subjects' %}" class="btn btn-secondary">Back</a>
+    </form>
+
+    <hr>
+    <h5>Existing Assignments</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Course</th>
+                <th>Semester</th>
+                <th>Instructor</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for assign in subject.coursesubject_set.all %}
+            <tr>
+                <td>{{ assign.course.title }}</td>
+                <td>{{ assign.semester.name }}</td>
+                <td>{{ assign.instructor.get_full_name|default:"N/A" }}</td>
+                <td>{{ assign.created_at|date:"Y-m-d" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center">No assignments yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

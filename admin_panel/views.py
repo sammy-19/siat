@@ -4,12 +4,12 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from random import sample
 from .models import AboutSection, PortalSettings
-from student_portal.models import StudentProfile
+from student_portal.models import StudentProfile, Subject, CourseSubject, Semester
 from instructor_portal.models import InstructorProfile
-from core.models import School, Department
+from core.models import School, Department, Course
 from .forms import (
     SchoolForm, DepartmentForm,
-    StudentSchoolForm, InstructorDepartmentForm, InstructorEditForm,
+    SubjectForm, InstructorEditForm,
     StudentRegistrationForm, StudentEditForm, InstructorRegistrationForm,
     AboutSectionForm, PortalSettingsForm
 )
@@ -57,7 +57,8 @@ def register_instructor(request):
     if request.method == 'POST':
         form = InstructorRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            instructor = form.save()
+            messages.success(request, f"Instructor {instructor.full_name} registered successfully!")
             return redirect('admin_panel:dashboard')
     else:
         form = InstructorRegistrationForm()
@@ -138,22 +139,18 @@ def edit_instructor(request, pk):
 
     if request.method == 'POST':
         form = InstructorEditForm(request.POST, request.FILES, instance=instructor)
-        dept_form = InstructorDepartmentForm(request.POST, instance=instructor)
-
-        if form.is_valid() and dept_form.is_valid():
+        if form.is_valid():
             form.save()
-            dept_form.save()
-            messages.success(request, "Instructor updated.")
+            messages.success(request, "Instructor updated successfully.")
             return redirect('admin_panel:manage_instructors')
     else:
         form = InstructorEditForm(instance=instructor)
-        dept_form = InstructorDepartmentForm(instance=instructor)
 
     return render(request, 'admin_panel/edit_instructor.html', {
         'form': form,
-        'dept_form': dept_form,
         'instructor': instructor
     })
+
 
 @login_required(login_url='/admin_panel/login/')
 def delete_instructor(request, pk):
@@ -274,3 +271,80 @@ def delete_department(request, pk):
         messages.success(request, "Department deleted.")
         return redirect('admin_panel:manage_departments')
     return render(request, 'admin_panel/confirm_delete.html', {'object': department, 'type': 'Department'})
+
+#--------------------- Subjects ----------------------
+@login_required(login_url='/admin_panel/login/')
+def manage_subjects(request):
+    subjects = Subject.objects.order_by('code')
+    return render(request, 'admin_panel/manage_subjects.html', {'subjects': subjects})
+
+@login_required(login_url='/admin_panel/login/')
+def add_subject(request):
+    if request.method == 'POST':
+        form = SubjectForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Subject created successfully.")
+            return redirect('admin_panel:manage_subjects')
+    else:
+        form = SubjectForm()
+    return render(request, 'admin_panel/add_subject.html', {'form': form})
+
+@login_required(login_url='/admin_panel/login/')
+def edit_subject(request, pk):
+    subject = get_object_or_404(Subject, pk=pk)
+    if request.method == 'POST':
+        form = SubjectForm(request.POST, instance=subject)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Subject updated successfully.")
+            return redirect('admin_panel:manage_subjects')
+    else:
+        form = SubjectForm(instance=subject)
+    return render(request, 'admin_panel/add_subject.html', {'form': form, 'edit_mode': True})
+
+@login_required(login_url='/admin_panel/login/')
+def delete_subject(request, pk):
+    subject = get_object_or_404(Subject, pk=pk)
+    subject.delete()
+    messages.warning(request, "Subject deleted successfully.")
+    return redirect('admin_panel:manage_subjects')
+
+@login_required(login_url='/admin_panel/login/')
+def assign_subject_to_courses(request, subject_id):
+    subject = get_object_or_404(Subject, pk=subject_id)
+    courses = Course.objects.all()
+    semesters = Semester.objects.all()
+
+    if request.method == 'POST':
+        selected_courses = request.POST.getlist('courses')
+        semester_id = request.POST.get('semester')
+        instructor_id = request.POST.get('instructor')
+
+        if not selected_courses or not semester_id:
+            messages.error(request, "Please select at least one course and a semester.")
+            return redirect('admin_panel:assign_subject_to_courses', subject_id=subject.id)
+
+        semester = Semester.objects.get(id=semester_id)
+
+        created_count = 0
+        for course_id in selected_courses:
+            course = Course.objects.get(id=course_id)
+            existing = CourseSubject.objects.filter(course=course, subject=subject, semester=semester).exists()
+            if not existing:
+                CourseSubject.objects.create(
+                    course=course,
+                    subject=subject,
+                    semester=semester,
+                    instructor=request.user  # or use instructor_id if assigning others
+                )
+                created_count += 1
+
+        messages.success(request, f"✅ {created_count} assignments created successfully.")
+        return redirect('admin_panel:manage_subjects')
+
+    return render(request, 'admin_panel/assign_subject.html', {
+        'subject': subject,
+        'courses': courses,
+        'semesters': semesters,
+    })

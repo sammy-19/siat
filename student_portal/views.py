@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import DetailView
-from .models import Enrollment, Assignment, Submission, LearningMaterial, Semester, StudentProfile, NotificationPreference, Announcement
+from .models import Enrollment, Assignment, Submission, CourseSubject, LearningMaterial, Semester, StudentProfile, NotificationPreference, Announcement
 from .forms import SubmissionForm, ProfileForm
 from core.models import Course
 from django.db import models
@@ -21,6 +21,20 @@ def dashboard(request):
     
     profile = get_object_or_404(StudentProfile, user=request.user)
     enrollments = Enrollment.objects.filter(student=profile)
+    current_semester = Semester.objects.filter(is_current=True).first()
+
+    # Get student enrollments
+    enrollments = Enrollment.objects.filter(student=profile)
+
+    # Get subjects for the student's current semester and enrolled courses
+    if current_semester:
+        course_subjects = CourseSubject.objects.filter(
+            course__in=enrollments.values_list('course', flat=True),
+            semester=current_semester,
+            is_active=True
+        ).select_related('subject', 'course')
+    else:
+        course_subjects = []
 
     # Attach avg_score to each enrollment
     course_labels = []
@@ -55,6 +69,7 @@ def dashboard(request):
         'overall_progress': overall_progress,
         'avg_score': overall_avg_score,
         'course_labels': course_labels,
+        'course_subjects':course_subjects,
         'avg_scores': avg_scores,
         'notification_pref': notification_pref,
         'announcements': announcements,
@@ -136,6 +151,19 @@ def materials(request):
         'meta_description': 'SIAT Student Portal - Access course outlines, modules, and videos for applied sciences technology Zambia/Kenya.',
     }
     return render(request, 'student_portal/materials.html', context)
+
+@login_required(login_url='/portal/login/')
+def subject_detail(request, pk):
+    subject = get_object_or_404(CourseSubject, subject__id=pk, semester__is_current=True)
+    assignments = subject.course.assignment_set.filter(course=subject.course)
+    materials = subject.course.learningmaterial_set.filter(course=subject.course)
+
+    return render(request, 'student_portal/subject_detail.html', {
+        'subject': subject,
+        'assignments': assignments,
+        'materials': materials
+    })
+
 
 @login_required(login_url='/portal/login/')
 def semester(request):

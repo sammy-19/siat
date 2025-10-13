@@ -1,0 +1,17 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Add Subject{% endblock %}
+{% block header_title %}{{ edit_mode|yesno:"Edit Subject,Add New Subject" }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card p-4 shadow-sm">
+        <h4 class="mb-3">{{ edit_mode|yesno:"Edit Subject,Add New Subject" }}</h4>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">{{ edit_mode|yesno:"Update,Save" }}</button>
+            <a href="{% url 'admin_panel:manage_subjects' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

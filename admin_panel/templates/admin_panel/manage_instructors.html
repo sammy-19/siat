@@ -3,6 +3,11 @@
 {% block header_title %}Manage Instructors{% endblock %}
 {% block content %}
 <div class="container mt-4">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
     <h3>All Instructors</h3>
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
@@ -12,6 +17,7 @@
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Department</th>
+                <th>Courses</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -28,6 +34,13 @@
                     {% else %}
                         <center>&mdash;</center>
                     {% endif %}
+                </td>
+                <td>
+                    {% for course in instructor.courses_taught.all %}
+                        <span class="badge bg-info text-dark">{{ course.title }}</span>
+                    {% empty %}
+                        <em>No courses assigned</em>
+                    {% endfor %}
                 </td>
                 <td>
                     <a href="{% url 'admin_panel:edit_instructor' instructor.pk %}" class="btn btn-sm btn-warning">Edit</a>
