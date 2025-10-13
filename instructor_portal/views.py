@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from core.models import Course
-from student_portal.models import StudentProfile, Enrollment, LearningMaterial, Assignment, Submission
+from student_portal.models import Enrollment, LearningMaterial, Assignment, Submission, CourseSubject, Semester
 from .models import InstructorProfile
 from cloudinary.uploader import upload
 from cloudinary.utils import cloudinary_url
@@ -9,6 +9,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Avg
 import logging
+from .forms import CourseSubjectForm
 
 
 MAX_UPLOAD_SIZE_MB = 4.5
@@ -205,6 +206,31 @@ def monitoring(request):
         'meta_description': 'SIAT Instructor Portal - Monitor student progress in taught courses.',
     }
     return render(request, 'instructor_portal/monitoring.html', context)
+
+@login_required
+def assign_subjects(request):
+    if request.method == "POST":
+        form = CourseSubjectForm(request.POST, user=request.user)
+        if form.is_valid():
+            course_subject = form.save(commit=False)
+            course_subject.instructor = request.user
+            course_subject.save()
+            messages.success(request, f"Subject '{course_subject.subject.title}' assigned successfully!")
+            return redirect("student_portal:manage_subjects")
+    else:
+        form = CourseSubjectForm(user=request.user)
+
+    return render(request, "student_portal/assign_subjects.html", {"form": form})
+
+@login_required
+def manage_subjects(request):
+    current_semester = Semester.objects.filter(is_current=True).first()
+    subjects = CourseSubject.objects.filter(instructor=request.user, semester=current_semester)
+
+    return render(request, "student_portal/manage_subjects.html", {
+        "subjects": subjects,
+        "semester": current_semester,
+    })
 
 @login_required(login_url='/instructor/login/')
 def delete_assignment(request, pk):

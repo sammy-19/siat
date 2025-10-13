@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth.models import User
 from core.models import EnrollmentApplication
-from student_portal.models import Enrollment
+from student_portal.models import Enrollment, CourseSubject, Subject, Semester
+from core.models import Course
+
 
 class StudentRegistrationForm(forms.Form):
     enrollment = forms.ModelChoiceField(queryset=EnrollmentApplication.objects.all())
@@ -26,3 +28,21 @@ class StudentRegistrationForm(forms.Form):
                 [student.email]
             )
         return student
+
+class CourseSubjectForm(forms.ModelForm):
+    class Meta:
+        model = CourseSubject
+        fields = ['course', 'subject', 'semester']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(CourseSubjectForm, self).__init__(*args, **kwargs)
+
+        # Only show current semester
+        self.fields['semester'].queryset = Semester.objects.filter(is_current=True)
+
+        # If instructor, restrict to their assigned courses
+        if user and not user.is_superuser:
+            self.fields['course'].queryset = Course.objects.filter(instructor=user)
+        # Subjects list comes from admin-created pool
+        self.fields['subject'].queryset = Subject.objects.all()
