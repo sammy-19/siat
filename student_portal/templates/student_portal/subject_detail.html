@@ -1,27 +1,46 @@
 {% extends 'student_portal/base.html' %}
-{% block title %}{{ subject.subject.title }}{% endblock %}
+{% block title %}{{ subject_instance.subject.title }}{% endblock %}
+{% block header_title %} Subject: {{ subject_instance.subject.title }} {% endblock %}
 
 {% block content %}
-<h3>{{ subject.subject.title }}</h3>
-<p><strong>Course:</strong> {{ subject.course.title }}</p>
-<p><strong>Instructor:</strong> {{ subject.instructor.get_full_name|default:"TBA" }}</p>
-<hr>
+<div class="container mt-4">
+    <p><strong>Code:</strong> {{ subject_instance.subject.code }}</p>
+    <p><strong>Instructor:</strong> {{ subject_instance.subject.instructor|default:"TBA" }}</p>
+    <p><strong>Description:</strong> {{ subject_instance.subject.description|default:"No description available." }}</p>
 
-<h4>Assignments</h4>
-<ul>
-    {% for a in assignments %}
-        <li>{{ a.title }} - Due: {{ a.due_date|date:"M d, Y" }}</li>
-    {% empty %}
-        <li>No assignments yet.</li>
-    {% endfor %}
-</ul>
+    <hr>
+    <h4>Assignments ({{ subject_instance.course.title }})</h4>
+    <ul>
+        {% for a in assignments %}
+            <li>
+                <strong>{{ a.title }}</strong> — 
+                Due: {{ a.due_date|date:"M d, Y" }}
+                {% if a.file %}
+                    <a href="{{ a.file }}" target="_blank" class="btn btn-sm btn-outline-primary ms-2">Download</a>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No assignments available.</li>
+        {% endfor %}
+    </ul>
 
-<h4>Learning Materials</h4>
-<ul>
-    {% for m in materials %}
-        <li><a href="{{ m.get_display_url }}" target="_blank">{{ m.title }}</a></li>
-    {% empty %}
-        <li>No materials uploaded yet.</li>
-    {% endfor %}
-</ul>
+    <hr>
+    <h4>Learning Materials ({{ subject_instance.course.title }})</h4>
+    <ul>
+        {% for m in materials %}
+            <li>
+                <a href="{{ m.get_display_url }}" target="_blank">{{ m.title }}</a>
+                {% if m.type == 'video' %}
+                    <span class="badge bg-info text-dark">Video</span>
+                {% elif m.type == 'module' %}
+                    <span class="badge bg-primary">Module</span>
+                {% elif m.type == 'outline' %}
+                    <span class="badge bg-secondary">Outline</span>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No materials uploaded yet.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

@@ -63,6 +63,7 @@
                 <th>Code</th>
                 <th>Title</th>
                 <th>Assigned Courses</th>
+                <th>Instructor</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -84,7 +85,23 @@
                     {% endwith %}
                 </td>
                 <td>
+                    {% with subject.coursesubject_set.all as instructor_assignments %}
+                        {% if instructor_assignments %}
+                            {% for assign in instructor_assignments %}
+                                {% if assign.instructor %}
+                                    <span class="badge bg-success">
+                                        {{ assign.instructor.full_name }}
+                                    </span><br>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <em>No instructors assigned</em>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                <td>
                     <a href="{% url 'admin_panel:assign_subject_to_courses' subject.id %}" class="btn btn-sm btn-primary">Assign to Courses</a>
+                    <a href="{% url 'admin_panel:assign_instructor_to_course' subject.id %}" class="btn btn-sm btn-outline-primary mt-1">Assign to Subjects</a>
                 </td>
             </tr>
             {% empty %}

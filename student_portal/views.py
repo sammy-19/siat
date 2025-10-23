@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import Http404
 from django.views.generic import DetailView
 from .models import Enrollment, Assignment, Submission, CourseSubject, LearningMaterial, Semester, StudentProfile, NotificationPreference, Announcement
 from .forms import SubmissionForm, ProfileForm
@@ -22,10 +23,7 @@ def dashboard(request):
     profile = get_object_or_404(StudentProfile, user=request.user)
     enrollments = Enrollment.objects.filter(student=profile)
     current_semester = Semester.objects.filter(is_current=True).first()
-
-    # Get student enrollments
-    enrollments = Enrollment.objects.filter(student=profile)
-
+    
     # Get subjects for the student's current semester and enrolled courses
     if current_semester:
         course_subjects = CourseSubject.objects.filter(
@@ -69,6 +67,7 @@ def dashboard(request):
         'overall_progress': overall_progress,
         'avg_score': overall_avg_score,
         'course_labels': course_labels,
+        'semester':current_semester,
         'course_subjects':course_subjects,
         'avg_scores': avg_scores,
         'notification_pref': notification_pref,
@@ -93,6 +92,7 @@ def profile(request):
 def courses(request):
     profile = get_object_or_404(StudentProfile, user=request.user)
     enrollments = Enrollment.objects.filter(student=profile)
+        
     return render(request, 'student_portal/courses.html', {'enrollments': enrollments})
 
 @login_required(login_url='/portal/login/')
@@ -154,16 +154,26 @@ def materials(request):
 
 @login_required(login_url='/portal/login/')
 def subject_detail(request, pk):
-    subject = get_object_or_404(CourseSubject, subject__id=pk, semester__is_current=True)
-    assignments = subject.course.assignment_set.filter(course=subject.course)
-    materials = subject.course.learningmaterial_set.filter(course=subject.course)
+    # Get all course-subject relationships for this subject
+    course_subjects = CourseSubject.objects.filter(
+        subject__id=pk,
+        semester__is_current=True
+    ).select_related('course', 'instructor', 'subject')
+
+    if not course_subjects.exists():
+        raise Http404("No subject found for current semester.")
+
+    # Optionally pick the first one to display its assignments/materials
+    subject_instance = course_subjects.first()
+    assignments = Assignment.objects.filter(course=subject_instance.course)
+    materials = LearningMaterial.objects.filter(course=subject_instance.course)
 
     return render(request, 'student_portal/subject_detail.html', {
-        'subject': subject,
+        'subject_instance': subject_instance,
+        'course_subjects': course_subjects,
         'assignments': assignments,
         'materials': materials
     })
-
 
 @login_required(login_url='/portal/login/')
 def semester(request):
@@ -179,6 +189,18 @@ class CourseDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         profile = StudentProfile.objects.get(user=self.request.user)
         materials = LearningMaterial.objects.filter(course=self.object).order_by('-created_at')
+        enrollments = Enrollment.objects.filter(student=profile)
+        current_semester = Semester.objects.filter(is_current=True).first()
+
+    # Get subjects for the student's current semester and enrolled courses
+        if current_semester:
+            course_subjects = CourseSubject.objects.filter(
+                course__in=enrollments.values_list('course', flat=True),
+                semester=current_semester,
+                is_active=True
+            ).select_related('subject', 'course')
+        else:
+            course_subjects = []
         
         materials_by_type = {
         'outline': materials.filter(type='outline'),
@@ -187,6 +209,7 @@ class CourseDetailView(DetailView):
     }
         context['enrollment'] = Enrollment.objects.get(student=profile, course=self.object)
         context['assignments'] = Assignment.objects.filter(course=self.object).order_by('-created_at')
+        context['course_subjects'] = course_subjects
         context['materials_by_type'] = materials_by_type
         return context
 

@@ -1,0 +1,54 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Assign Instructor{% endblock %}
+{% block header_title %}Assign Instructor to Course{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h4>Assign Instructor for: {{ subject.title }} ({{ subject.code }})</h4>
+    <p class="text-muted">Assign or change instructors for each course offering this subject.</p>
+    <hr>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Course</th>
+                    <th>Semester</th>
+                    <th>Current Instructor</th>
+                    <th>Assign New Instructor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cs in course_subjects %}
+                <tr>
+                    <td>{{ cs.course.title }}</td>
+                    <td>{{ cs.semester.name }}</td>
+                    <td>{{ cs.instructor.full_name|default:"None" }}</td>
+                    <td>
+                        <select name="instructor_{{ cs.id }}" class="form-select">
+                            <option value="">-- Select Instructor --</option>
+                            {% for instructor in instructors %}
+                                <option value="{{ instructor.id }}"
+                                    {% if cs.instructor and instructor.id == cs.instructor.id %}selected{% endif %}>
+                                    {{ instructor.full_name|default:"None" }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a href="{% url 'admin_panel:manage_subjects' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

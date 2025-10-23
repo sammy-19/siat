@@ -12,6 +12,21 @@
             <p>{{ course.description }}</p>
         </div>
     </div>
+    <h3>Subjects</h3>
+    <div class="row">
+        {% for cs in course_subjects %}
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5>{{ cs.subject.title }}</h5>
+                    <a href="{% url 'student_portal:subject_detail' cs.subject.id %}" 
+                    class="btn btn-sm btn-primary">View Subject</a>               
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <hr>
     <h3>Assignments</h3>
     <div class="row">
         {% for assignment in assignments %}
@@ -26,6 +41,7 @@
         </div>
         {% endfor %}
     </div>
+    <hr>
     <h3>Learning Materials</h3>
     <div class="row">
         {% for type, materials in materials_by_type.items %}

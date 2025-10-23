@@ -42,4 +42,5 @@ urlpatterns = [
     path('subjects/edit/<int:pk>/', views.edit_subject, name='edit_subject'),
     path('subjects/delete/<int:pk>/', views.delete_subject, name='delete_subject'),
     path('assign_subject/<int:subject_id>/', views.assign_subject_to_courses, name='assign_subject_to_courses'),
+    path('subjects/assign-instructor/<int:subject_id>/', views.assign_instructor_to_course, name='assign_instructor_to_course'),
 ]

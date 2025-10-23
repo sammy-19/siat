@@ -348,3 +348,41 @@ def assign_subject_to_courses(request, subject_id):
         'courses': courses,
         'semesters': semesters,
     })
+    
+
+@login_required
+def assign_instructor_to_course(request, subject_id):
+    # Get the selected subject
+    subject = get_object_or_404(Subject, id=subject_id)
+
+    # Get all CourseSubject instances where this subject is offered
+    course_subjects = CourseSubject.objects.filter(subject=subject).select_related(
+        'course', 'semester', 'instructor'
+    ).order_by('course__title', 'semester__start_date')
+
+    # Get all instructors from InstructorProfile
+    instructors = InstructorProfile.objects.all().order_by('full_name')
+
+    if request.method == 'POST':
+        # Loop through all course-subject relationships
+        for cs in course_subjects:
+            instructor_id = request.POST.get(f'instructor_{cs.id}')
+            if instructor_id:
+                try:
+                    instructor = InstructorProfile.objects.get(id=instructor_id)
+                    cs.instructor = instructor
+                except InstructorProfile.DoesNotExist:
+                    cs.instructor = None
+            else:
+                cs.instructor = None
+            cs.save()
+
+        messages.success(request, f"Instructors successfully assigned for {subject.title}.")
+        return redirect('admin_panel:manage_subjects')
+
+    # Render the assignment page
+    return render(request, 'admin_panel/assign_instructor.html', {
+        'subject': subject,
+        'course_subjects': course_subjects,
+        'instructors': instructors,
+    })

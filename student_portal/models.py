@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from cloudinary.models import CloudinaryField
 from core.models import Course, School
+from instructor_portal.models import InstructorProfile
 import datetime
 
 
@@ -59,7 +60,7 @@ class CourseSubject(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     subject = models.ForeignKey('Subject', on_delete=models.CASCADE)
     semester = models.ForeignKey('Semester', on_delete=models.CASCADE)
-    instructor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    instructor = models.ForeignKey(InstructorProfile, on_delete=models.SET_NULL, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -68,7 +69,6 @@ class CourseSubject(models.Model):
 
     def __str__(self):
         return f"{self.course.title} - {self.subject.title} ({self.semester.name})"
-
 
 
 class Assignment(models.Model):
