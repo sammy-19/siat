@@ -110,16 +110,22 @@
                                         src="{{ material.get_embed_url }}" 
                                         title="{{ material.title }}"
                                         frameborder="0" 
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                        referrerpolicy="strict-origin-when-cross-origin"
                                         allowfullscreen>
                                     </iframe>
                                 </div>
-                                <a href="{{ material.video_url }}" target="_blank" class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-youtube"></i> Open in YouTube
-                                </a>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ material.video_url }}" target="_blank" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-youtube"></i> Open in YouTube
+                                    </a>
+                                    <a href="{{ material.video_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-box-arrow-up-right"></i> Watch in New Tab
+                                    </a>
+                                </div>
                             {% else %}
                                 <div class="alert alert-warning">
-                                    <i class="bi bi-exclamation-triangle"></i> Invalid video URL
+                                    <i class="bi bi-exclamation-triangle"></i> Invalid video URL. Please contact your instructor.
                                 </div>
                             {% endif %}
                         {% elif material.file %}
