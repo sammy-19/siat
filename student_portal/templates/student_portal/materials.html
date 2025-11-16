@@ -3,6 +3,27 @@
 {% block header_title %}Learning Materials{% endblock %}
 {% block content %}
     <h3>Learning Materials</h3>
+    
+    {% if subjects %}
+    <div class="mb-4">
+        <h4>Select a Subject:</h4>
+        <div class="row">
+            <div class="col-md-12">
+                <a href="{% url 'student_portal:materials' %}" 
+                   class="btn {% if not selected_subject_id %}btn-primary{% else %}btn-outline-primary{% endif %} mb-2 me-2">
+                    All Subjects
+                </a>
+                {% for subject in subjects %}
+                <a href="{% url 'student_portal:materials' %}?subject_id={{ subject.id }}" 
+                   class="btn {% if selected_subject_id == subject.id %}btn-primary{% else %}btn-outline-primary{% endif %} mb-2 me-2">
+                    {{ subject.code }} - {{ subject.title }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
     <div class="row">
         {% for type, materials in materials_by_type.items %}
             {% if materials %}
@@ -12,27 +33,31 @@
                         <div class="card">
                             <div class="card-body">
                                 <h5>{{ material.title }} ({{ material.get_type_display }})</h5>
+                                <p><strong>Subject:</strong> {{ material.subject.code }} - {{ material.subject.title }}</p>
                                 <p>Created: {{ material.created_at|date:"F d, Y" }}</p>
-                                <a href="{{ material.get_file_url }}" 
-                                   {% if material.type == 'video' %} 
-                                       target="_blank" 
-                                   {% else %} 
-                                       download 
-                                   {% endif %} 
-                                   class="btn btn-primary">
-                                    <i class="material-icons">{% if material.type == 'video' %}play_arrow{% else %}download{% endif %}</i> 
-                                    {% if material.type == 'video' %}Watch{% else %}Download{% endif %}
-                                </a>
+                                
+                                {% if material.type == 'video' and material.video_url %}
+                                    <div class="mb-2">
+                                        <a href="{{ material.video_url }}" target="_blank" class="btn btn-primary btn-lg">
+                                            <i class="material-icons">play_arrow</i> Watch Video on YouTube
+                                        </a>
+                                        <p class="text-muted mt-2"><small>Click the button above to watch the video in a new tab</small></p>
+                                    </div>
+                                {% elif material.file %}
+                                    <a href="{{ material.file.url }}" download class="btn btn-primary">
+                                        <i class="material-icons">download</i> Download
+                                    </a>
+                                {% else %}
+                                    <p class="text-muted">No file available</p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 {% endfor %}
-            {% else %}
-                <p class="alert alert-info">No {{ type|title }} materials available.</p>
             {% endif %}
         {% endfor %}
         {% if materials_by_type.outline|length == 0 and materials_by_type.module|length == 0 and materials_by_type.video|length == 0 %}
-            <p class="alert alert-info">No learning materials available for your enrolled courses.</p>
+            <p class="alert alert-info">No learning materials available {% if selected_subject_id %}for this subject{% else %}for your enrolled courses{% endif %}.</p>
         {% endif %}
     </div>
     <meta name="description" content="SIAT Student Portal - Access course outlines, modules, and videos for applied sciences technology Zambia.">

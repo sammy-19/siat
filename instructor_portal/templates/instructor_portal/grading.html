@@ -41,7 +41,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for enrollment in course_subject.enrollments.all %}
+                            {% for enrollment in course_subject.student_enrollments %}
                             <tr>
                                 <td>{{ enrollment.student.student_number }}</td>
                                 <td>{{ enrollment.student.full_name }}</td>

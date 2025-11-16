@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.views.generic import DetailView
-from .models import Enrollment, Assignment, Submission, CourseSubject, LearningMaterial, Semester, StudentProfile, NotificationPreference, Announcement
+from .models import Enrollment, Assignment, Submission, CourseSubject, LearningMaterial, Semester, StudentProfile, NotificationPreference, Announcement, Notification
 from .forms import SubmissionForm, ProfileForm
 from core.models import Course
 from django.db import models
@@ -38,6 +38,7 @@ def dashboard(request):
     subject_cards = []
     course_labels = []
     avg_scores = []
+    avg_progress_list = []
     if current_semester:
         subjects_qs = CourseSubject.objects.filter(
             course__in=enrollments.values_list('course', flat=True),
@@ -79,6 +80,7 @@ def dashboard(request):
             })
             course_labels.append(subject_title)
             avg_scores.append(round(subj_avg_score or 0, 2))
+            avg_progress_list.append(round(subj_progress or 0, 2))
     
     # Get overall progress from SubjectEnrollments
     from .models import SubjectEnrollment
@@ -104,6 +106,7 @@ def dashboard(request):
     import json
     course_labels_json = json.dumps(course_labels)
     avg_scores_json = json.dumps(avg_scores)
+    avg_progress_json = json.dumps(avg_progress_list)
 
     context = {
         'profile': profile,
@@ -115,6 +118,7 @@ def dashboard(request):
         'course_subjects':course_subjects,
         'subject_cards': subject_cards,
         'avg_scores': avg_scores_json,
+        'avg_progress': avg_progress_json,
         'notification_pref': notification_pref,
         'announcements': announcements,
         'meta_description': 'SIAT Student Portal Dashboard - Track progress, grades, scores, and notifications.',
@@ -187,32 +191,42 @@ def download_pdf(request, assignment_id):
 
 @login_required(login_url='/portal/login/')
 def materials(request):
+    from .models import Subject
     profile = get_object_or_404(StudentProfile, user=request.user)
     enrollments = Enrollment.objects.filter(student=profile)
     current_semester = Semester.objects.filter(is_current=True).first()
     
+    selected_subject_id = request.GET.get('subject_id')
+    
     if not enrollments.exists() or not current_semester:
         logger.warning(f"No enrollments or semester found for student {profile.user.username}")
-        materials = LearningMaterial.objects.none()  # Empty queryset
+        subjects = []
+        materials = LearningMaterial.objects.none()
     else:
-        # Get subjects for enrolled courses in current semester
         subject_ids = CourseSubject.objects.filter(
             course__in=enrollments.values_list('course', flat=True),
             semester=current_semester,
             is_active=True
         ).values_list('subject_id', flat=True)
         
-        materials = LearningMaterial.objects.filter(subject_id__in=subject_ids).order_by('-created_at')
+        subjects = Subject.objects.filter(id__in=subject_ids).distinct()
+        
+        if selected_subject_id:
+            materials = LearningMaterial.objects.filter(subject_id=selected_subject_id).order_by('-created_at')
+        else:
+            materials = LearningMaterial.objects.filter(subject_id__in=subject_ids).order_by('-created_at')
+        
         if not materials.exists():
             logger.warning(f"No materials found for subjects {list(subject_ids)} for student {profile.user.username}")
 
-    # Group by type for display
     materials_by_type = {
         'outline': materials.filter(type='outline'),
         'module': materials.filter(type='module'),
         'video': materials.filter(type='video'),
     }
     context = {
+        'subjects': subjects,
+        'selected_subject_id': int(selected_subject_id) if selected_subject_id else None,
         'materials_by_type': materials_by_type,
         'meta_description': 'SIAT Student Portal - Access course outlines, modules, and videos for applied sciences technology Zambia/Kenya.',
     }
@@ -325,3 +339,36 @@ def student_logout(request):
     logout(request)
     messages.success(request, "Successfully logged out.")
     return redirect('student_portal:student_login')
+
+@login_required(login_url='/portal/login/')
+def get_notifications(request):
+    profile = get_object_or_404(StudentProfile, user=request.user)
+    notifications = Notification.objects.filter(student=profile)[:10]
+    
+    data = {
+        'notifications': [{
+            'id': n.id,
+            'type': n.type,
+            'title': n.title,
+            'message': n.message,
+            'link': n.link,
+            'is_read': n.is_read,
+            'created_at': n.created_at.strftime('%b %d, %Y %I:%M %p')
+        } for n in notifications],
+        'unread_count': notifications.filter(is_read=False).count()
+    }
+    return JsonResponse(data)
+
+@login_required(login_url='/portal/login/')
+def mark_notification_read(request, notification_id):
+    profile = get_object_or_404(StudentProfile, user=request.user)
+    notification = get_object_or_404(Notification, id=notification_id, student=profile)
+    notification.is_read = True
+    notification.save()
+    return JsonResponse({'success': True})
+
+@login_required(login_url='/portal/login/')
+def mark_all_notifications_read(request):
+    profile = get_object_or_404(StudentProfile, user=request.user)
+    Notification.objects.filter(student=profile, is_read=False).update(is_read=True)
+    return JsonResponse({'success': True})

@@ -16,5 +16,8 @@ urlpatterns = [
     path('course/<int:pk>/', CourseDetailView.as_view(), name='course_detail'),
     path('assignment/<int:pk>/', AssignmentDetailView.as_view(), name='assignment_detail'),
     path('download/<int:assignment_id>/', download_pdf, name='download_pdf'),
+    path('notifications/', get_notifications, name='get_notifications'),
+    path('notifications/<int:notification_id>/read/', mark_notification_read, name='mark_notification_read'),
+    path('notifications/mark-all-read/', mark_all_notifications_read, name='mark_all_notifications_read'),
     path('logout/', student_logout, name='student_logout'),
 ]

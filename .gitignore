@@ -2,5 +2,8 @@ __pycache__/
 *.pyc
 *.pyo
 db.sqlite3  # Ignore local DB; use Neon in prod
-.env  # For secrets
+.env
+env
 media/  # Cloudinary handles media
+.qodo
+staticfiles_build/

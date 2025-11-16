@@ -25,10 +25,14 @@
     <!-- Chart Section -->
     <div class="card mb-4 shadow">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Subject Performance Overview</h5>
+            <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Subject Performance & Progress Overview</h5>
         </div>
         <div class="card-body">
             <canvas id="scoreChart" height="100"></canvas>
+            <div class="mt-3 text-center">
+                <span class="badge" style="background-color: rgba(40, 167, 69, 0.8); padding: 5px 10px;">■ Average Score</span>
+                <span class="ms-3 badge" style="background-color: rgba(54, 162, 235, 1); padding: 5px 10px;">● Progress</span>
+            </div>
         </div>
     </div>
 
@@ -83,42 +87,83 @@
     const ctx = document.getElementById('scoreChart').getContext('2d');
     const labels = {{ course_labels|safe }};
     const scores = {{ avg_scores|safe }};
+    const progress = {{ avg_progress|safe }};
     
     const scoreChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Average Score (%)',
-                data: scores,
-                backgroundColor: scores.map(score => {
-                    if (score >= 80) return 'rgba(40, 167, 69, 0.7)';  // Green
-                    if (score >= 60) return 'rgba(23, 162, 184, 0.7)';  // Blue
-                    if (score >= 50) return 'rgba(255, 193, 7, 0.7)';   // Yellow
-                    return 'rgba(220, 53, 69, 0.7)';  // Red
-                }),
-                borderColor: scores.map(score => {
-                    if (score >= 80) return 'rgba(40, 167, 69, 1)';
-                    if (score >= 60) return 'rgba(23, 162, 184, 1)';
-                    if (score >= 50) return 'rgba(255, 193, 7, 1)';
-                    return 'rgba(220, 53, 69, 1)';
-                }),
-                borderWidth: 2
-            }]
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'Average Score (%)',
+                    data: scores,
+                    backgroundColor: scores.map(score => {
+                        if (score >= 80) return 'rgba(40, 167, 69, 0.7)';  // Green
+                        if (score >= 60) return 'rgba(23, 162, 184, 0.7)';  // Blue
+                        if (score >= 50) return 'rgba(255, 193, 7, 0.7)';   // Yellow
+                        return 'rgba(220, 53, 69, 0.7)';  // Red
+                    }),
+                    borderColor: scores.map(score => {
+                        if (score >= 80) return 'rgba(40, 167, 69, 1)';
+                        if (score >= 60) return 'rgba(23, 162, 184, 1)';
+                        if (score >= 50) return 'rgba(255, 193, 7, 1)';
+                        return 'rgba(220, 53, 69, 1)';
+                    }),
+                    borderWidth: 2,
+                    yAxisID: 'y'
+                },
+                {
+                    type: 'line',
+                    label: 'Progress (%)',
+                    data: progress,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    yAxisID: 'y'
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
             plugins: {
                 legend: {
                     display: true,
                     position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 12,
+                            weight: 'bold'
+                        }
+                    }
                 },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
                             return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
                         }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        size: 14
+                    },
+                    bodyFont: {
+                        size: 13
                     }
                 }
             },
@@ -128,14 +173,20 @@
                     max: 100,
                     title: {
                         display: true,
-                        text: 'Score (%)',
+                        text: 'Percentage (%)',
                         font: {
                             size: 14,
                             weight: 'bold'
                         }
                     },
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.1)'
+                        color: 'rgba(0, 0, 0, 0.1)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
                     }
                 },
                 x: {

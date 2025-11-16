@@ -45,6 +45,59 @@
             z-index: 1100;
             background-color: var(--gold);
         }
+        .notification-bell {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            cursor: pointer;
+        }
+        .notification-bell .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--red);
+            color: var(--white);
+            border-radius: 50%;
+            padding: 4px 7px;
+            font-size: 12px;
+        }
+        .notification-dropdown {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            width: 350px;
+            max-height: 500px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1040;
+        }
+        .notification-dropdown.show {
+            display: block;
+        }
+        .notification-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        .notification-item:hover {
+            background-color: #f5f5f5;
+        }
+        .notification-item.unread {
+            background-color: #e3f2fd;
+        }
+        .notification-header {
+            padding: 12px;
+            background-color: var(--blue);
+            color: var(--white);
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
@@ -78,6 +131,19 @@
         <a href="{% url 'student_portal:semester' %}"><i class="material-icons">calendar_today</i> Semester</a>
         <a href="{% url 'student_portal:student_logout' %}"><i class="material-icons">logout</i> Logout</a>
     </div>
+    <div class="notification-bell" id="notificationBell">
+        <i class="material-icons" style="font-size: 32px; color: var(--blue);">notifications</i>
+        <span class="badge" id="notificationCount">0</span>
+    </div>
+    
+    <div class="notification-dropdown" id="notificationDropdown">
+        <div class="notification-header">
+            <strong>Notifications</strong>
+            <a href="#" id="markAllRead" style="color: var(--gold); text-decoration: none;">Mark all read</a>
+        </div>
+        <div id="notificationList"></div>
+    </div>
+    
     <div class="main-content">
         <div class="header">
             <h2 style="color: var(--blue);">{% block header_title %}Welcome, {{ profile.full_name }}{% endblock %}</h2>
@@ -96,22 +162,84 @@
         let isGranted = false;
         if ('Notification' in window) {
             isGranted = Notification.permission === 'granted';
-            document.getElementById('requestPermission').style.display = isGranted ? 'none' : 'inline-block';
-            document.getElementById('requestPermission').addEventListener('click', () => {
-                Notification.requestPermission().then(permission => {
-                    isGranted = permission === 'granted';
-                    document.getElementById('requestPermission').style.display = isGranted ? 'none' : 'inline-block';
-                    if (isGranted) alert('Notifications enabled!');
+            const requestBtn = document.getElementById('requestPermission');
+            if (requestBtn) {
+                requestBtn.style.display = isGranted ? 'none' : 'inline-block';
+                requestBtn.addEventListener('click', () => {
+                    Notification.requestPermission().then(permission => {
+                        isGranted = permission === 'granted';
+                        requestBtn.style.display = isGranted ? 'none' : 'inline-block';
+                        if (isGranted) alert('Notifications enabled!');
+                    });
                 });
-            });
-        }
-
-        function notifyUpdate(type, title, message) {
-            if (isGranted && document.getElementById('notificationToggle').checked) {
-                new Notification(`SIAT Update - ${type}`, { body: message, icon: 'https://via.placeholder.com/32' });
             }
         }
-        setTimeout(() => notifyUpdate('Assignment', 'New Task', 'Assignment due tomorrow!'), 5000);
+
+        const notificationBell = document.getElementById('notificationBell');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        const notificationList = document.getElementById('notificationList');
+        const notificationCount = document.getElementById('notificationCount');
+        const markAllReadBtn = document.getElementById('markAllRead');
+        
+        function loadNotifications() {
+            fetch('{% url "student_portal:get_notifications" %}')
+                .then(response => response.json())
+                .then(data => {
+                    notificationCount.textContent = data.unread_count;
+                    notificationCount.style.display = data.unread_count > 0 ? 'block' : 'none';
+                    
+                    if (data.notifications.length === 0) {
+                        notificationList.innerHTML = '<div class="notification-item">No notifications</div>';
+                    } else {
+                        notificationList.innerHTML = data.notifications.map(n => `
+                            <div class="notification-item ${n.is_read ? '' : 'unread'}" 
+                                 onclick="markAsRead(${n.id}, '${n.link || ''}')">
+                                <strong>${n.title}</strong>
+                                <p style="margin: 5px 0; font-size: 14px;">${n.message}</p>
+                                <small style="color: #888;">${n.created_at}</small>
+                            </div>
+                        `).join('');
+                    }
+                });
+        }
+        
+        function markAsRead(notificationId, link) {
+            fetch(`/portal/notifications/${notificationId}/read/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            }).then(() => {
+                loadNotifications();
+                if (link) {
+                    window.location.href = link;
+                }
+            });
+        }
+        
+        notificationBell.addEventListener('click', () => {
+            notificationDropdown.classList.toggle('show');
+        });
+        
+        markAllReadBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            fetch('{% url "student_portal:mark_all_notifications_read" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            }).then(() => loadNotifications());
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                notificationDropdown.classList.remove('show');
+            }
+        });
+        
+        loadNotifications();
+        setInterval(loadNotifications, 30000);
     </script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

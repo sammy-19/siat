@@ -21,22 +21,44 @@ def dashboard(request):
         logout(request)
         return redirect("admin_panel:admin_login")
     
-    # fetch all students and instructors
+    from django.db.models import Count
+    import json
+    
     students_qs = list(StudentProfile.objects.all().prefetch_related('enrollment_set__course'))
     instructors_qs = list(InstructorProfile.objects.all())
 
-    # pick up to 3 random ones each
     students = sample(students_qs, min(len(students_qs), 3))
     instructors = sample(instructors_qs, min(len(instructors_qs), 3))
     
     about_sections = AboutSection.objects.all()
     settings = PortalSettings.objects.first() or PortalSettings.objects.create()
     
+    total_students = StudentProfile.objects.count()
+    total_instructors = InstructorProfile.objects.count()
+    
+    subjects = Subject.objects.all()
+    subject_labels = [f"{s.code}" for s in subjects]
+    students_per_subject = []
+    
+    for subject in subjects:
+        course_ids = CourseSubject.objects.filter(
+            subject=subject
+        ).values_list('course_id', flat=True).distinct()
+        
+        student_count = StudentProfile.objects.filter(
+            enrollment__course_id__in=course_ids
+        ).distinct().count()
+        students_per_subject.append(student_count)
+    
     context = {
         'students': students,
         'instructors': instructors,
         'about_sections': about_sections,
         'settings': settings,
+        'total_students': total_students,
+        'total_instructors': total_instructors,
+        'subject_labels': json.dumps(subject_labels),
+        'students_per_subject': json.dumps(students_per_subject),
         'meta_description': 'SIAT Admin CMS Dashboard - Manage students, instructors, and content in applied sciences technology Zambia.',
     }
     return render(request, 'admin_panel/dashboard.html', context)

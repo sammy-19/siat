@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from core.models import Course
 from student_portal.models import (
     SubjectEnrollment, LearningMaterial, Assignment, Submission, 
-    CourseSubject, Semester, Subject
+    CourseSubject, Semester, Subject, Notification, StudentProfile
 )
 from .models import InstructorProfile
 from cloudinary.uploader import upload
@@ -99,9 +99,28 @@ def materials(request):
                 if not is_youtube:
                     messages.error(request, "Only YouTube links are allowed for video materials (e.g., https://www.youtube.com/watch?v=... or https://youtu.be/...).")
                     return redirect('instructor_portal:materials')
-                LearningMaterial.objects.create(
+                material = LearningMaterial.objects.create(
                     subject=subject, title=title, type='video', video_url=video_url
                 )
+                
+                course_ids = CourseSubject.objects.filter(
+                    subject=subject,
+                    semester__is_current=True
+                ).values_list('course_id', flat=True)
+                
+                students = StudentProfile.objects.filter(
+                    enrollment__course_id__in=course_ids
+                ).distinct()
+                
+                for student in students:
+                    Notification.objects.create(
+                        student=student,
+                        type='material',
+                        title=f'New Material: {title}',
+                        message=f'A new video has been uploaded for {subject.title}',
+                        link=f'/portal/materials/?subject_id={subject.id}'
+                    )
+                
                 messages.success(request, "Video link saved successfully.")
             else:
                 if not file:
@@ -113,9 +132,28 @@ def materials(request):
                     return redirect('instructor_portal:materials')
 
                 upload_result = upload(file, resource_type='raw')
-                LearningMaterial.objects.create(
+                material = LearningMaterial.objects.create(
                     subject=subject, title=title, type=material_type, file=upload_result.get('secure_url')
                 )
+                
+                course_ids = CourseSubject.objects.filter(
+                    subject=subject,
+                    semester__is_current=True
+                ).values_list('course_id', flat=True)
+                
+                students = StudentProfile.objects.filter(
+                    enrollment__course_id__in=course_ids
+                ).distinct()
+                
+                for student in students:
+                    Notification.objects.create(
+                        student=student,
+                        type='material',
+                        title=f'New Material: {title}',
+                        message=f'A new {material_type} has been uploaded for {subject.title}',
+                        link=f'/portal/materials/?subject_id={subject.id}'
+                    )
+                
                 messages.success(request, "Material uploaded successfully.")
         except Exception as e:
             logger.error(f"Material upload failed: {str(e)}")
@@ -161,8 +199,26 @@ def assignments(request):
                 assignment_data['file'] = upload_result.get('secure_url')
                 assignment_data['file_public_id'] = upload_result.get('public_id')
             
-            # Create assignment regardless of file presence
-            Assignment.objects.create(**assignment_data)
+            assignment = Assignment.objects.create(**assignment_data)
+            
+            course_ids = CourseSubject.objects.filter(
+                subject=subject,
+                semester__is_current=True
+            ).values_list('course_id', flat=True)
+            
+            students = StudentProfile.objects.filter(
+                enrollment__course_id__in=course_ids
+            ).distinct()
+            
+            for student in students:
+                Notification.objects.create(
+                    student=student,
+                    type='assignment',
+                    title=f'New Assignment: {title}',
+                    message=f'A new assignment has been posted for {subject.title}. Due: {due_date}',
+                    link='/portal/assignments/'
+                )
+            
             messages.success(request, "Assignment created successfully.")
         except Exception as e:
             logger.error(f"Assignment creation failed: {str(e)}")
@@ -234,12 +290,27 @@ def submissions(request):
 
 @login_required(login_url='/instructor/login/')
 def grading(request):
+    from student_portal.models import Enrollment
+    
     profile = get_object_or_404(InstructorProfile, user=request.user)
     current_semester = Semester.objects.filter(is_current=True).first()
     course_subjects = CourseSubject.objects.filter(
         instructor=profile,
         semester=current_semester
-    ).select_related('subject')
+    ).select_related('subject', 'course', 'semester')
+    
+    for cs in course_subjects:
+        course_enrollments = Enrollment.objects.filter(course=cs.course).select_related('student')
+        
+        for enrollment in course_enrollments:
+            subject_enrollment, created = SubjectEnrollment.objects.get_or_create(
+                student=enrollment.student,
+                course_subject=cs
+            )
+        
+        cs.student_enrollments = SubjectEnrollment.objects.filter(
+            course_subject=cs
+        ).select_related('student')
     
     if request.method == 'POST':
         for course_subject in course_subjects:
@@ -270,6 +341,8 @@ def grading(request):
 
 @login_required(login_url='/instructor/login/')
 def monitoring(request):
+    from student_portal.models import Enrollment
+    
     profile = get_object_or_404(InstructorProfile, user=request.user)
     current_semester = Semester.objects.filter(is_current=True).first()
     course_subjects = CourseSubject.objects.filter(
@@ -277,7 +350,15 @@ def monitoring(request):
         semester=current_semester
     ).select_related('subject', 'course')
     
-    # Get enrollments for each subject
+    for cs in course_subjects:
+        course_enrollments = Enrollment.objects.filter(course=cs.course).select_related('student')
+        
+        for enrollment in course_enrollments:
+            subject_enrollment, created = SubjectEnrollment.objects.get_or_create(
+                student=enrollment.student,
+                course_subject=cs
+            )
+    
     enrollments = SubjectEnrollment.objects.filter(
         course_subject__in=course_subjects
     ).select_related('student', 'course_subject__subject')
