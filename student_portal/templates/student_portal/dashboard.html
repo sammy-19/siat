@@ -20,13 +20,15 @@
     </div>
     <hr>
 
-    <h3>Students' Overview</h3>
+    <h3>Subjects' Overview</h3>
     
     <!-- Chart Section -->
-    <div class="card mb-4">
+    <div class="card mb-4 shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Subject Performance Overview</h5>
+        </div>
         <div class="card-body">
-            <h5>Performance Overview</h5>
-            <canvas id="scoreChart" height="120"></canvas>
+            <canvas id="scoreChart" height="100"></canvas>
         </div>
     </div>
 
@@ -42,6 +44,15 @@
                     <p><strong>Course:</strong> {{ cs.course.title }}</p>
                     <p><strong>Instructor:</strong> {{ cs.instructor.full_name|default:"TBA" }}</p>
                     <p><strong>Status:</strong> {% if cs.is_active %} Active {% else %} Inactive {% endif %}</p>
+                    {% if subject_cards %}
+                        {% for sc in subject_cards %}
+                            {% if sc.id == cs.subject.id %}
+                                <p><strong>Avg Score:</strong> {{ sc.avg_score }}%</p>
+                                <p><strong>Avg Progress:</strong> {{ sc.avg_progress }}%</p>
+                                <p><strong>Assignments:</strong> {{ sc.assignments_count }} | <strong>Materials:</strong> {{ sc.materials_count }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                     <a href="{% url 'student_portal:subject_detail' cs.subject.id %}" 
                     class="btn btn-sm btn-primary">View Subject</a>
                 </div>
@@ -70,27 +81,74 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const ctx = document.getElementById('scoreChart').getContext('2d');
+    const labels = {{ course_labels|safe }};
+    const scores = {{ avg_scores|safe }};
+    
     const scoreChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: {{ course_labels|safe }},
+            labels: labels,
             datasets: [{
-                label: 'Average Score per Course',
-                data: {{ avg_scores|safe }},
-                backgroundColor: 'rgba(255, 159, 64, 0.6)',
-                borderColor: 'rgba(255, 99, 32, 1)',
-                borderWidth: 1
+                label: 'Average Score (%)',
+                data: scores,
+                backgroundColor: scores.map(score => {
+                    if (score >= 80) return 'rgba(40, 167, 69, 0.7)';  // Green
+                    if (score >= 60) return 'rgba(23, 162, 184, 0.7)';  // Blue
+                    if (score >= 50) return 'rgba(255, 193, 7, 0.7)';   // Yellow
+                    return 'rgba(220, 53, 69, 0.7)';  // Red
+                }),
+                borderColor: scores.map(score => {
+                    if (score >= 80) return 'rgba(40, 167, 69, 1)';
+                    if (score >= 60) return 'rgba(23, 162, 184, 1)';
+                    if (score >= 50) return 'rgba(255, 193, 7, 1)';
+                    return 'rgba(220, 53, 69, 1)';
+                }),
+                borderWidth: 2
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
+                        }
+                    }
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
                     max: 100,
                     title: {
                         display: true,
-                        text: 'Score (%)'
+                        text: 'Score (%)',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Subjects',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        display: false
                     }
                 }
             }

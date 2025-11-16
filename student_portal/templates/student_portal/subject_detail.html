@@ -1,46 +1,199 @@
 {% extends 'student_portal/base.html' %}
 {% block title %}{{ subject_instance.subject.title }}{% endblock %}
-{% block header_title %} Subject: {{ subject_instance.subject.title }} {% endblock %}
+{% block header_title %}{{ subject_instance.subject.code }} - {{ subject_instance.subject.title }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <p><strong>Code:</strong> {{ subject_instance.subject.code }}</p>
-    <p><strong>Instructor:</strong> {{ subject_instance.subject.instructor|default:"TBA" }}</p>
-    <p><strong>Description:</strong> {{ subject_instance.subject.description|default:"No description available." }}</p>
+    <!-- Subject Info Card -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Subject Information</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Code:</strong> {{ subject_instance.subject.code }}</p>
+                    <p><strong>Title:</strong> {{ subject_instance.subject.title }}</p>
+                    <p><strong>Course:</strong> {{ subject_instance.course.title }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Instructor:</strong> 
+                        {% if subject_instance.instructor %}
+                            {{ subject_instance.instructor.full_name }}
+                        {% else %}
+                            <span class="text-muted">To be assigned</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Semester:</strong> {{ subject_instance.semester.name }}</p>
+                    <p><strong>Description:</strong> {{ subject_instance.subject.description|default:"No description available." }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <hr>
-    <h4>Assignments ({{ subject_instance.course.title }})</h4>
-    <ul>
-        {% for a in assignments %}
-            <li>
-                <strong>{{ a.title }}</strong> — 
-                Due: {{ a.due_date|date:"M d, Y" }}
-                {% if a.file %}
-                    <a href="{{ a.file }}" target="_blank" class="btn btn-sm btn-outline-primary ms-2">Download</a>
-                {% endif %}
-            </li>
-        {% empty %}
-            <li>No assignments available.</li>
-        {% endfor %}
-    </ul>
+    <!-- Performance Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Average Score</h6>
+                    <h2 class="card-title {% if subject_avg_score >= 80 %}text-success{% elif subject_avg_score >= 60 %}text-info{% elif subject_avg_score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ subject_avg_score|floatformat:1 }}%
+                    </h2>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar {% if subject_avg_score >= 80 %}bg-success{% elif subject_avg_score >= 60 %}bg-info{% elif subject_avg_score >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                             role="progressbar" 
+                             style="width: {{ subject_avg_score }}%">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Progress</h6>
+                    <h2 class="card-title text-primary">{{ subject_avg_progress|floatformat:1 }}%</h2>
+                    <div class="progress" style="height: 20px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ subject_avg_progress }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">Grade</h6>
+                    <h2 class="card-title">
+                        {% if subject_enrollment and subject_enrollment.grade %}
+                            <span class="{% if subject_enrollment.grade == 'A' %}text-success{% elif subject_enrollment.grade == 'B' %}text-info{% elif subject_enrollment.grade == 'C' %}text-warning{% else %}text-danger{% endif %}">
+                                {{ subject_enrollment.grade }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">Not graded</span>
+                        {% endif %}
+                    </h2>
+                    {% if subject_enrollment and subject_enrollment.final_score %}
+                    <p class="text-muted">Final Score: {{ subject_enrollment.final_score }}/100</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <hr>
-    <h4>Learning Materials ({{ subject_instance.course.title }})</h4>
-    <ul>
-        {% for m in materials %}
-            <li>
-                <a href="{{ m.get_display_url }}" target="_blank">{{ m.title }}</a>
-                {% if m.type == 'video' %}
-                    <span class="badge bg-info text-dark">Video</span>
-                {% elif m.type == 'module' %}
-                    <span class="badge bg-primary">Module</span>
-                {% elif m.type == 'outline' %}
-                    <span class="badge bg-secondary">Outline</span>
-                {% endif %}
-            </li>
-        {% empty %}
-            <li>No materials uploaded yet.</li>
-        {% endfor %}
-    </ul>
+    <!-- Learning Materials Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0"><i class="bi bi-book"></i> Learning Materials</h4>
+        </div>
+        <div class="card-body">
+            {% if materials %}
+                {% for material in materials %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ material.title }}</h5>
+                            <span class="badge 
+                                {% if material.type == 'video' %}bg-danger
+                                {% elif material.type == 'module' %}bg-primary
+                                {% else %}bg-secondary{% endif %}">
+                                {{ material.get_type_display }}
+                            </span>
+                        </div>
+                        <small class="text-muted">Uploaded: {{ material.created_at|date:"F d, Y" }}</small>
+                    </div>
+                    <div class="card-body">
+                        {% if material.type == 'video' and material.video_url %}
+                            {% if material.is_valid_youtube %}
+                                <div class="ratio ratio-16x9 mb-3">
+                                    <iframe 
+                                        src="{{ material.get_embed_url }}" 
+                                        title="{{ material.title }}"
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <a href="{{ material.video_url }}" target="_blank" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-youtube"></i> Open in YouTube
+                                </a>
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle"></i> Invalid video URL
+                                </div>
+                            {% endif %}
+                        {% elif material.file %}
+                            <a href="{{ material.file.url }}" class="btn btn-primary" download>
+                                <i class="bi bi-download"></i> Download {{ material.get_type_display }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No learning materials uploaded for this subject yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Assignments Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning">
+            <h4 class="mb-0"><i class="bi bi-pencil-square"></i> Assignments</h4>
+        </div>
+        <div class="card-body">
+            {% if assignments %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Assignment</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr>
+                                <td><strong>{{ assignment.title }}</strong></td>
+                                <td>{{ assignment.due_date|date:"M d, Y - H:i" }}</td>
+                                <td>
+                                    {% now "Y-m-d H:i:s" as now_time %}
+                                    {% if assignment.due_date|date:"Y-m-d H:i:s" < now_time %}
+                                        <span class="badge bg-danger">Overdue</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Open</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if assignment.file %}
+                                        <a href="{{ assignment.file }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-download"></i> Download
+                                        </a>
+                                    {% endif %}
+                                    <a href="{% url 'student_portal:assignments' %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-upload"></i> Submit
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> No assignments for this subject yet.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <a href="{% url 'student_portal:dashboard' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
 </div>
 {% endblock %}

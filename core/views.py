@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Course, AboutSection, ContactInfo
+from .models import Course, ContactInfo
+from admin_panel.models import AboutSection
 from django.core.mail import send_mail
 from django.conf import settings
 from .forms import EnrollmentForm, ContactForm

@@ -1,24 +1,112 @@
 {% extends 'instructor_portal/base.html' %}
 {% block title %}Student Monitoring{% endblock %}
-{% block header_title %}Monitor Students{% endblock %}
+{% block header_title %}Monitor Student Progress{% endblock %}
 {% block content %}
 <section class="py-4">
-    <h4>Student Monitoring</h4>
-    <p>Total Enrolled: {{ num_enrolled }}</p>
-    {% for course in courses %}
-        <div class="card mt-3">
-            <div class="card-body">
-                <h5>{{ course.title }}</h5>
-                {% for enrollment in course.enrollment_set.all %}
-                    <p>{{ enrollment.student.full_name }} - Progress: {{ enrollment.progress }}%</p>
-                    <div class="progress">
-                        <div class="progress-bar" style="width: {{ enrollment.progress }}%; background-color: var(--accent-orange);"></div>
-                    </div>
-                {% empty %}
-                    <p class="alert alert-info">No students enrolled in {{ course.title }}.</p>
-                {% endfor %}
-            </div>
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Track student progress and performance for your assigned subjects.
+        <strong>Total Students Enrolled: {{ num_enrolled }}</strong>
+    </div>
+    
+    {% for course_subject in course_subjects %}
+    <div class="card mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-people"></i> {{ course_subject.subject.code }} - {{ course_subject.subject.title }}
+                <br>
+                <small>{{ course_subject.course.title }} ({{ course_subject.semester.name }})</small>
+            </h5>
         </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Student Number</th>
+                            <th>Student Name</th>
+                            <th>School</th>
+                            <th>Progress</th>
+                            <th>Final Score</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in enrollments %}
+                            {% if enrollment.course_subject.id == course_subject.id %}
+                            <tr>
+                                <td>{{ enrollment.student.student_number }}</td>
+                                <td>{{ enrollment.student.full_name }}</td>
+                                <td>{{ enrollment.student.school.name|default:"Not specified" }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1" style="height: 25px;">
+                                            <div class="progress-bar 
+                                                {% if enrollment.progress >= 75 %}bg-success
+                                                {% elif enrollment.progress >= 50 %}bg-info
+                                                {% elif enrollment.progress >= 25 %}bg-warning
+                                                {% else %}bg-danger{% endif %}" 
+                                                role="progressbar" 
+                                                style="width: {{ enrollment.progress }}%"
+                                                aria-valuenow="{{ enrollment.progress }}" 
+                                                aria-valuemin="0" 
+                                                aria-valuemax="100">
+                                                {{ enrollment.progress }}%
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if enrollment.final_score %}
+                                        <span class="badge 
+                                            {% if enrollment.final_score >= 80 %}bg-success
+                                            {% elif enrollment.final_score >= 60 %}bg-info
+                                            {% elif enrollment.final_score >= 50 %}bg-warning
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ enrollment.final_score }}/100
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">Not graded</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if enrollment.grade %}
+                                        <strong class="
+                                            {% if enrollment.grade == 'A' %}text-success
+                                            {% elif enrollment.grade == 'B' %}text-info
+                                            {% elif enrollment.grade == 'C' %}text-warning
+                                            {% else %}text-danger{% endif %}">
+                                            {{ enrollment.grade }}
+                                        </strong>
+                                    {% else %}
+                                        <span class="text-muted">--</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% with subject_has_students=False %}
+                {% for enrollment in enrollments %}
+                    {% if enrollment.course_subject.id == course_subject.id %}
+                        {% with subject_has_students=True %}{% endwith %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if not subject_has_students %}
+                <div class="alert alert-warning">
+                    No students enrolled in this subject yet.
+                </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-warning">
+        You have no subjects assigned for the current semester.
+    </div>
     {% endfor %}
 </section>
 {% endblock %}

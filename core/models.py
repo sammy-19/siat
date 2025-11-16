@@ -5,8 +5,7 @@ from django.utils.text import slugify
 
 class School(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    def __str__(self): return self.name
-
+    
     def __str__(self):
         return self.name
 
@@ -24,13 +23,13 @@ class Course(models.Model):
         ('short_certificate', 'Short Certificate Course'),
         ('diploma', 'Diploma Course'),
     )
-    title = models.CharField(max_length=200, blank=True)
-    description = models.TextField()
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='Diploma Course')
-    duration = models.CharField(max_length=100)  # e.g., '2 weeks' or '1 year'
+    title = models.CharField(max_length=200, default='Untitled Course')
+    description = models.TextField(default='No description provided.')
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='diploma')
+    duration = models.CharField(max_length=100, default='Not specified')  # e.g., '2 weeks' or '1 year'
     fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)  # e.g., 200.00 for cert
     image = CloudinaryField('image', blank=True, null=True)  # Thumbnail via Cloudinary
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -56,15 +55,15 @@ class EnrollmentApplication(models.Model):
     )
 
     # Personal Info
-    full_name = models.CharField(max_length=200)
-    email = models.EmailField()
-    phone = models.CharField(max_length=20)
-    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='Male')
-    date_of_birth = models.DateField(null=True)
+    full_name = models.CharField(max_length=200, default='Full Name')
+    email = models.EmailField(default='email@example.com')
+    phone = models.CharField(max_length=20, default='0000000000')
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, default='male')
+    date_of_birth = models.DateField(null=True, blank=True)
 
     # Education
-    highest_qualification = models.CharField(max_length=200, default="e.g., Grade 12 Certificate, etc")  # e.g., 'High School', 'Bachelor's'
-    education_background = models.TextField(default='School Name, Grades, Final Year Attended')  # Details on schools, grades, etc.
+    highest_qualification = models.CharField(max_length=200, default="Grade 12 Certificate")
+    education_background = models.TextField(default='School Name, Grades, Final Year Attended')
 
     # Next of Kin
     next_of_kin_name = models.CharField(max_length=200, null=True, blank=True)
@@ -72,18 +71,18 @@ class EnrollmentApplication(models.Model):
     next_of_kin_contact = models.CharField(max_length=20, null=True, blank=True)
 
     # Identity & Disability
-    identity_type = models.CharField(max_length=20, choices=(('national_id', 'National ID'), ('passport', 'Passport')), default="National ID")
+    identity_type = models.CharField(max_length=20, choices=(('national_id', 'National ID'), ('passport', 'Passport')), default='national_id')
     identity_number = models.CharField(max_length=50, default="010101/10/1")
     disability_status = models.CharField(max_length=20, choices=DISABILITY_CHOICES, default='none')
     disability_details = models.TextField(blank=True)  # Optional if 'other'
 
     # Documents (Cloudinary for storage)
-    identity_document = CloudinaryField('identity_document', blank=False, resource_type='raw', default='NRC')  # PDF/Image
-    secondary_results = CloudinaryField('secondary_results', blank=True, resource_type='raw', default='Results')  # Required for diplomas
+    identity_document = CloudinaryField('identity_document', resource_type='raw')  # PDF/Image
+    secondary_results = CloudinaryField('secondary_results', blank=True, null=True, resource_type='raw')  # Required for diplomas
 
     # Other
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    message = models.TextField(blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True)
+    message = models.TextField(blank=True, default='')
     
     STATUS_CHOICES = (
         ('pending', 'Pending'),
@@ -96,27 +95,20 @@ class EnrollmentApplication(models.Model):
 
     def __str__(self):
         return f"{self.full_name} - {self.course.title} ({self.status})"
-    
-class AboutSection(models.Model):
-    title = models.CharField(max_length=255)
-    content = models.TextField()
-
-    def __str__(self):
-        return self.title
 
 class ContactInfo(models.Model):
-    phone = models.CharField(max_length=20)
-    email = models.EmailField()
-    address = models.TextField(blank=True)
+    phone = models.CharField(max_length=20, default='0000000000')
+    email = models.EmailField(default='info@example.com')
+    address = models.TextField(blank=True, default='')
 
     def __str__(self):
         return self.phone
 
 class ContactMessage(models.Model):
-    name = models.CharField(max_length=200)
-    email = models.EmailField()
-    subject = models.CharField(max_length=200)
-    message = models.TextField()
+    name = models.CharField(max_length=200, default='Anonymous')
+    email = models.EmailField(default='email@example.com')
+    subject = models.CharField(max_length=200, default='No Subject')
+    message = models.TextField(default='No message provided.')
     sent_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

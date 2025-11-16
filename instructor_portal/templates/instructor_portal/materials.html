@@ -1,23 +1,26 @@
 {% extends 'instructor_portal/base.html' %}
 {% block title %}Materials Management{% endblock %}
-{% block header_title %}Manage Course Materials{% endblock %}
+{% block header_title %}Manage Subject Materials{% endblock %}
 {% block content %}
 <section class="py-4">
     {% if messages %}
         {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show">
                 {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         {% endfor %}
     {% endif %}
+    
     <h4>Upload New Material</h4>
-    <form method="post" enctype="multipart/form-data" class="card p-4">
+    <form method="post" enctype="multipart/form-data" class="card p-4 mb-4">
         {% csrf_token %}
         <div class="mb-3">
-            <label for="course_id" class="form-label">Course</label>
-            <select name="course_id" class="form-control" required>
-                {% for course in courses %}
-                    <option value="{{ course.id }}">{{ course.title }}</option>
+            <label for="subject_id" class="form-label">Subject</label>
+            <select name="subject_id" class="form-control" required>
+                <option value="">-- Select Subject --</option>
+                {% for subject in subjects %}
+                    <option value="{{ subject.id }}">{{ subject.code }} - {{ subject.title }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -28,20 +31,22 @@
         <div class="mb-3">
             <label for="type" class="form-label">Material Type</label>
             <select name="type" id="materialType" class="form-control" required onchange="toggleInputs()">
-                <option value="outline">Course Outline</option>
+                <option value="outline">Subject Outline</option>
                 <option value="module">Module</option>
                 <option value="video">Video</option>
             </select>
         </div>
 
         <div class="mb-3" id="fileInput">
-            <label for="file" class="form-label">File (PDF only)</label>
+            <label for="file" class="form-label">File (PDF only, max 4.5MB)</label>
             <input type="file" name="file" class="form-control" accept=".pdf">
+            <small class="text-muted">Upload study materials, notes, or subject outlines</small>
         </div>
 
         <div class="mb-3 d-none" id="videoInput">
             <label for="video_url" class="form-label">YouTube Link</label>
-            <input type="url" name="video_url" class="form-control" placeholder="https://youtube.com/watch?v=...">
+            <input type="url" name="video_url" class="form-control" placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/...">
+            <small class="text-muted">Paste a YouTube video link for lecture recordings</small>
         </div>
 
         <script>
@@ -51,35 +56,72 @@
                 document.getElementById("videoInput").classList.toggle("d-none", type !== "video");
             }
         </script>
-        <button type="submit" class="btn btn-primary">Upload</button>
+        <button type="submit" class="btn btn-primary">Upload Material</button>
     </form>
 
-    <h4 class="mt-4">Existing Materials</h4>
-    {% for course in courses %}
+    <h4 class="mt-5">Existing Materials by Subject</h4>
+    {% for subject in subjects %}
         <div class="card mt-3">
-            <div class="collapse-header" data-course="{{ course.id }}">
-                <i class="material-icons">folder</i> {{ course.title }} ({{ materials|dictsort:"course_id"|length }} materials)
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-folder"></i> {{ subject.code }} - {{ subject.title }}
+                    <span class="badge bg-light text-dark float-end">
+                        {{ materials|length }} material(s)
+                    </span>
+                </h5>
             </div>
-            <div class="collapse-content">
-                {% for material in materials|dictsort:"course_id" %}
-                    <div class="card-body">
-                        <h5>{{ material.title }} ({{ material.get_type_display }})</h5>
-                        <p>Uploaded: {{ material.created_at|date:"F d, Y" }}</p>
-                        {% if material.type == 'video' and material.video_url %}
-                            <iframe width="560" height="315"
-                                    src="{{ material.get_embed_url }}"
-                                    frameborder="0" allowfullscreen>
-                            </iframe>
-                        {% elif material.file %}
-                            <a href="{{ material.file.url }}" class="btn btn-primary" download>Download</a>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for material in materials %}
+                        {% if material.subject.id == subject.id %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ material.title }}</h6>
+                                    <small class="text-muted">
+                                        <span class="badge bg-secondary">{{ material.get_type_display }}</span>
+                                        Uploaded: {{ material.created_at|date:"F d, Y" }}
+                                    </small>
+                                </div>
+                                <div>
+                                    {% if material.type == 'video' and material.video_url %}
+                                        <a href="{{ material.video_url }}" target="_blank" class="btn btn-sm btn-info">
+                                            <i class="bi bi-play-circle"></i> Watch Video
+                                        </a>
+                                    {% elif material.file %}
+                                        <a href="{{ material.file.url }}" class="btn btn-sm btn-primary" download>
+                                            <i class="bi bi-download"></i> Download
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if material.type == 'video' and material.video_url and material.get_embed_url %}
+                            <div class="mt-3">
+                                <iframe width="100%" height="400"
+                                        src="{{ material.get_embed_url }}"
+                                        frameborder="0" 
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen>
+                                </iframe>
+                            </div>
+                            {% endif %}
+                        </div>
                         {% endif %}
-                        <a href="{% url 'instructor_portal:materials' %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                    </div>
-                {% empty %}
-                    <p class="alert alert-info">No materials for this course.</p>
-                {% endfor %}
+                    {% endfor %}
+                </div>
+                
+                {% if not materials or materials|length == 0 %}
+                <div class="alert alert-info mt-2">
+                    No materials uploaded for this subject yet.
+                </div>
+                {% endif %}
             </div>
         </div>
+    {% empty %}
+    <div class="alert alert-warning">
+        You have no subjects assigned. Please contact the administrator.
+    </div>
     {% endfor %}
 </section>
 {% endblock %}

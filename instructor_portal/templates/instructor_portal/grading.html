@@ -1,30 +1,103 @@
 {% extends 'instructor_portal/base.html' %}
-{% block title %}Grading{% endblock %}
-{% block header_title %}Grade Students{% endblock %}
+{% block title %}Final Grading{% endblock %}
+{% block header_title %}Subject Final Grades{% endblock %}
 {% block content %}
 <section class="py-4">
     {% if messages %}
         {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show">
                 {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         {% endfor %}
     {% endif %}
-    <form method="post" class="card p-4">
+    
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> Assign final grades and scores for each student per subject. 
+        These will be used for official transcripts and certificates.
+    </div>
+    
+    <form method="post">
         {% csrf_token %}
-        <h4>Grade Students</h4>
-        {% for course in courses %}
-            <h5>{{ course.title }}</h5>
-            {% for enrollment in course.enrollment_set.all %}
-                <div class="mb-2">
-                    <label>{{ enrollment.student.full_name }}:</label>
-                    <input type="text" name="grade_{{ enrollment.id }}" value="{{ enrollment.grade }}" class="form-control d-inline" style="width: 60px;" placeholder="Grade">
+        
+        {% for course_subject in course_subjects %}
+        <div class="card mt-4">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">
+                    {{ course_subject.subject.code }} - {{ course_subject.subject.title }}
+                    <small class="text-muted">({{ course_subject.course.title }} - {{ course_subject.semester.name }})</small>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Student Number</th>
+                                <th>Student Name</th>
+                                <th>Progress (%)</th>
+                                <th>Final Score (0-100)</th>
+                                <th>Letter Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in course_subject.enrollments.all %}
+                            <tr>
+                                <td>{{ enrollment.student.student_number }}</td>
+                                <td>{{ enrollment.student.full_name }}</td>
+                                <td>
+                                    <div class="progress" style="height: 25px;">
+                                        <div class="progress-bar" role="progressbar" 
+                                             style="width: {{ enrollment.progress|default:0 }}%"
+                                             aria-valuenow="{{ enrollment.progress|default:0 }}" 
+                                             aria-valuemin="0" aria-valuemax="100">
+                                            {{ enrollment.progress|default:0 }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="number" 
+                                           name="score_{{ enrollment.id }}" 
+                                           value="{{ enrollment.final_score|default:'' }}" 
+                                           class="form-control" 
+                                           min="0" max="100"
+                                           placeholder="0-100"
+                                           style="width: 100px;">
+                                </td>
+                                <td>
+                                    <select name="grade_{{ enrollment.id }}" class="form-select" style="width: 100px;">
+                                        <option value="">--</option>
+                                        <option value="A" {% if enrollment.grade == 'A' %}selected{% endif %}>A</option>
+                                        <option value="B" {% if enrollment.grade == 'B' %}selected{% endif %}>B</option>
+                                        <option value="C" {% if enrollment.grade == 'C' %}selected{% endif %}>C</option>
+                                        <option value="D" {% if enrollment.grade == 'D' %}selected{% endif %}>D</option>
+                                        <option value="F" {% if enrollment.grade == 'F' %}selected{% endif %}>F</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No students enrolled in this subject</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            {% empty %}
-                <p class="alert alert-info">No students enrolled in {{ course.title }}.</p>
-            {% endfor %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-warning">
+            You have no subjects assigned for the current semester.
+        </div>
         {% endfor %}
-        <button type="submit" class="btn btn-primary mt-3">Save Grades</button>
+        
+        {% if course_subjects %}
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-save"></i> Save All Grades
+            </button>
+        </div>
+        {% endif %}
     </form>
 </section>
 {% endblock %}

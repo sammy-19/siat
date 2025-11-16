@@ -3,30 +3,80 @@
 {% block header_title %}Welcome, {{ profile.full_name }}{% endblock %}
 {% block content %}
     <section class="py-4">
-        <h3>Your Courses</h3>
+        <h3>Your Subjects (Current Semester)</h3>
         <div class="row">
-            {% for course in courses %}
+            {% for subject in subjects %}
             <div class="col-md-4 mb-4">
                 <div class="card">
                     <div class="card-body">
-                        <h5>{{ course.title }}</h5>
-                        <p>Enrolled Students: {{ course.num_enrolled }}</p>
-                        <p>Average Score: {{ course.avg_score|default:"N/A"|floatformat:1 }}/100</p>
-                        <a href="{% url 'instructor_portal:monitoring' %}" class="btn btn-primary">Monitor Students</a>
-                        <a href="{% url 'instructor_portal:materials' %}" class="btn btn-primary mt-2">Upload Materials</a>
-                        <a href="{% url 'instructor_portal:grading' %}" class="btn btn-primary mt-2">Manage Grades</a>
+                        <h5>{{ subject.code }} - {{ subject.title }}</h5>
+                        <p class="text-muted">{{ subject.description|truncatewords:15|default:"No description" }}</p>
+                        <p><strong>Enrolled Students:</strong> {{ subject.num_enrolled|default:0 }}</p>
+                        <p><strong>Average Score:</strong> {{ subject.avg_score|default:"N/A"|floatformat:1 }}/100</p>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'instructor_portal:monitoring' %}" class="btn btn-primary btn-sm">Monitor Students</a>
+                            <a href="{% url 'instructor_portal:materials' %}" class="btn btn-success btn-sm">Upload Materials</a>
+                            <a href="{% url 'instructor_portal:assignments' %}" class="btn btn-info btn-sm">Manage Assignments</a>
+                            <a href="{% url 'instructor_portal:grading' %}" class="btn btn-warning btn-sm">Manage Grades</a>
+                        </div>
                     </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    You have no subjects assigned for the current semester.
                 </div>
             </div>
             {% endfor %}
         </div>
 
-        <h3 class="mt-4">Latest Submissions</h3>
+        <h3 class="mt-5">Course-Subject Assignments</h3>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Subject</th>
+                        <th>Semester</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cs in course_subjects %}
+                    <tr>
+                        <td>{{ cs.course.title }}</td>
+                        <td><strong>{{ cs.subject.code }}</strong> - {{ cs.subject.title }}</td>
+                        <td>{{ cs.semester.name }}</td>
+                        <td>
+                            {% if cs.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No subject assignments found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <h3 class="mt-5">Latest Submissions</h3>
         <ul class="list-group">
             {% for submission in latest_submissions %}
-            <li class="list-group-item">
-                {{ submission.student.full_name }} - {{ submission.assignment.title }}
-                (Score: {{ submission.score|default:"Pending" }}/100)
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ submission.student.full_name }}</strong> - {{ submission.assignment.title }}
+                    <br>
+                    <small class="text-muted">Subject: {{ submission.assignment.subject.title }}</small>
+                </div>
+                <span class="badge bg-primary rounded-pill">
+                    Score: {{ submission.score|default:"Pending" }}/100
+                </span>
             </li>
             {% empty %}
             <li class="list-group-item">No submissions yet.</li>

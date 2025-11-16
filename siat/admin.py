@@ -5,7 +5,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from student_portal.models import StudentProfile, Enrollment
 from instructor_portal.models import InstructorProfile
-from core.models import Course, AboutSection, EnrollmentApplication
+from core.models import Course, EnrollmentApplication
+from admin_panel.models import AboutSection
 
 class UserAdmin(BaseUserAdmin):
     list_display = ('username', 'email', 'is_staff', 'groups_list')

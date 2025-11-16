@@ -332,11 +332,12 @@ def assign_subject_to_courses(request, subject_id):
             course = Course.objects.get(id=course_id)
             existing = CourseSubject.objects.filter(course=course, subject=subject, semester=semester).exists()
             if not existing:
+                # Don't assign instructor here - let admin assign instructors separately
                 CourseSubject.objects.create(
                     course=course,
                     subject=subject,
                     semester=semester,
-                    instructor=request.user  # or use instructor_id if assigning others
+                    instructor=None  # Will be assigned later by admin
                 )
                 created_count += 1
 

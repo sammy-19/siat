@@ -1,34 +1,121 @@
 {% extends 'instructor_portal/base.html' %}
 {% block title %}Submissions Management{% endblock %}
-{% block header_title %}Manage Submissions{% endblock %}
+{% block header_title %}Review & Grade Submissions{% endblock %}
 {% block content %}
 <section class="py-4">
     {% if messages %}
         {% for message in messages %}
-            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+            <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show">
                 {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         {% endfor %}
     {% endif %}
-    <h4>Student Submissions</h4>
-    {% for submission in submissions %}
-        <div class="card mt-3">
-            <div class="card-body">
-                <h5>{{ submission.student.full_name }} - {{ submission.assignment.title }}</h5>
-                <p>Submitted: {{ submission.submitted_at|date:"F d, Y H:i" }}</p>
-                <a href="{{ submission.file.url }}" download class="btn btn-primary">Download</a>
-                <form method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="submission_id" value="{{ submission.id }}">
-                    <input type="number" name="score" min="0" max="100" value="{{ submission.score }}" class="form-control">
-                    <button type="submit" class="btn btn-success btn-sm">Save Score</button>
-                    <input type="text" name="grade" value="{{ submission.grade }}" class="form-control d-inline" style="width: 60px;" placeholder="Grade">
-                    <button type="submit" class="btn btn-success">Save Grade</button>
-                </form>
-            </div>
+    
+    <h4>Student Submissions by Subject</h4>
+    
+    {% for subject in subjects %}
+    <div class="card mt-3">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-file-earmark-check"></i> {{ subject.code }} - {{ subject.title }}
+            </h5>
         </div>
+        <div class="card-body">
+            {% for submission in submissions %}
+                {% if submission.assignment.subject.id == subject.id %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ submission.student.full_name }}</strong>
+                                <span class="badge bg-secondary">{{ submission.student.student_number }}</span>
+                            </div>
+                            <small class="text-muted">
+                                Submitted: {{ submission.submitted_at|date:"M d, Y - H:i" }}
+                            </small>
+                        </div>
+                        <div class="mt-1">
+                            <small><strong>Assignment:</strong> {{ submission.assignment.title }}</small>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="{{ submission.file.url }}" target="_blank" class="btn btn-primary btn-sm mb-2">
+                                    <i class="bi bi-download"></i> Download Submission
+                                </a>
+                                
+                                {% if submission.assignment.file %}
+                                <a href="{% url 'instructor_portal:download_pdf' submission.assignment.id %}" class="btn btn-info btn-sm mb-2">
+                                    <i class="bi bi-file-earmark-text"></i> View Assignment Question
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <form method="post" class="d-flex gap-2 align-items-end">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="submission_id" value="{{ submission.id }}">
+                                    
+                                    <div class="flex-grow-1">
+                                        <label for="score_{{ submission.id }}" class="form-label mb-0">Score (0-100)</label>
+                                        <input type="number" name="score" id="score_{{ submission.id }}" 
+                                               min="0" max="100" 
+                                               value="{{ submission.score|default:'' }}" 
+                                               class="form-control" 
+                                               placeholder="Enter score">
+                                    </div>
+                                    
+                                    <div style="width: 100px;">
+                                        <label for="grade_{{ submission.id }}" class="form-label mb-0">Grade</label>
+                                        <input type="text" name="grade" id="grade_{{ submission.id }}"
+                                               value="{{ submission.grade|default:'' }}" 
+                                               class="form-control" 
+                                               placeholder="A, B, C">
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-save"></i> Save
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        {% if submission.score or submission.grade %}
+                        <div class="alert alert-success mt-3 mb-0">
+                            <strong>Current Grade:</strong> 
+                            {{ submission.score|default:"--" }}/100
+                            {% if submission.grade %} | Grade: <strong>{{ submission.grade }}</strong>{% endif %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning mt-3 mb-0">
+                            <i class="bi bi-exclamation-circle"></i> Not graded yet
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+            
+            {% with subject_has_submissions=False %}
+                {% for submission in submissions %}
+                    {% if submission.assignment.subject.id == subject.id %}
+                        {% with subject_has_submissions=True %}{% endwith %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if not subject_has_submissions %}
+                <div class="alert alert-info">
+                    No submissions received for this subject yet.
+                </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
     {% empty %}
-        <p class="alert alert-info">No submissions received.</p>
+    <div class="alert alert-warning">
+        You have no subjects assigned. Please contact the administrator.
+    </div>
     {% endfor %}
 </section>
 {% endblock %}
