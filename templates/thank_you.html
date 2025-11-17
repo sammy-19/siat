@@ -1,11 +1,141 @@
 {% extends 'base.html' %}
+{% load static %}
 
+{% block title %}Application Submitted - Thank You{% endblock %}
 {% block content %}
-<section class="py-5 text-center">
-    <div class="container">
-        <h2 style="color: #FF8C00;">Thank You!</h2>
-        <p>Your application has been submitted. We'll contact you soon.</p>
-        <a href="{% url 'courses' %}" class="btn btn-secondary">Back to Courses</a>
+
+<!-- Success Page -->
+<section class="py-5" style="min-height: 70vh; display: flex; align-items: center; background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+    <div class="container text-center text-white">
+        <div data-aos="zoom-in">
+            <div class="mb-4">
+                <i class="fas fa-check-circle" style="font-size: 8rem; animation: bounce 1s;"></i>
+            </div>
+            <h1 class="display-3 mb-4">Thank You!</h1>
+            <p class="lead mb-4">Your application has been successfully submitted.</p>
+            <div class="card bg-white text-dark mx-auto mb-4" style="max-width: 600px;">
+                <div class="card-body p-4">
+                    <h4 class="mb-3"><i class="fas fa-info-circle text-primary"></i> What's Next?</h4>
+                    <div class="text-start">
+                        <p class="mb-2"><i class="fas fa-envelope text-success me-2"></i> Check your email for confirmation</p>
+                        <p class="mb-2"><i class="fas fa-clock text-warning me-2"></i> We'll review your application within 2-3 business days</p>
+                        <p class="mb-2"><i class="fas fa-phone text-primary me-2"></i> Our team will contact you soon</p>
+                        <p class="mb-0"><i class="fas fa-user-graduate text-danger me-2"></i> Welcome to the SIAT family!</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="/" class="btn btn-light btn-lg">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+                <a href="/courses/" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-book"></i> Browse More Courses
+                </a>
+                <a href="/contact/" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-question-circle"></i> Contact Us
+                </a>
+            </div>
+        </div>
     </div>
 </section>
+
+<!-- Next Steps Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h3 class="text-center section-title mb-5" data-aos="fade-up">
+            <i class="fas fa-route"></i> Your Journey Ahead
+        </h3>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 shadow h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <div class="rounded-circle bg-primary text-white mx-auto" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-file-alt fa-2x"></i>
+                            </div>
+                        </div>
+                        <h5>Application Review</h5>
+                        <p class="text-muted">Our team reviews your documents</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 shadow h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <div class="rounded-circle bg-warning text-white mx-auto" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-envelope fa-2x"></i>
+                            </div>
+                        </div>
+                        <h5>Acceptance Letter</h5>
+                        <p class="text-muted">Receive your offer via email</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card border-0 shadow h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <div class="rounded-circle bg-success text-white mx-auto" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-credit-card fa-2x"></i>
+                            </div>
+                        </div>
+                        <h5>Payment & Registration</h5>
+                        <p class="text-muted">Complete your enrollment</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="card border-0 shadow h-100 text-center">
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <div class="rounded-circle bg-danger text-white mx-auto" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-rocket fa-2x"></i>
+                            </div>
+                        </div>
+                        <h5>Start Learning</h5>
+                        <p class="text-muted">Begin your journey to success!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-lg" style="border-top: 5px solid #FFA500;" data-aos="fade-up">
+                    <div class="card-body p-4 text-center">
+                        <h4 class="mb-3"><i class="fas fa-headset"></i> Need Assistance?</h4>
+                        <p class="text-muted mb-4">Our admissions team is here to help!</p>
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <a href="tel:+260762516232" class="btn btn-primary">
+                                <i class="fas fa-phone"></i> +260 762 516 232
+                            </a>
+                            <a href="mailto:sunriseinstituteofapplied21@gmail.com" class="btn btn-outline-primary">
+                                <i class="fas fa-envelope"></i> Email Us
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-20px); }
+    60% { transform: translateY(-10px); }
+}
+</style>
+
 {% endblock %}

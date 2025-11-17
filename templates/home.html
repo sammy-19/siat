@@ -4,67 +4,320 @@
 {% block title %}Home{% endblock %}
 {% block content %}
 
-<!-- Introductory Banner Section -->
-    <section class="hero">
-        <div class="container">
-            <h2>Sunrise Institute of Applied Sciences and Technology</h2>
-            <h5 style='color: #b0b0b0'>Get equipped with necessary skills with our certificate and Diploma Programmes</h5>
-            <p style='color: #b0b0b0'>Online courses to further your career. Register now!</p>
-            <a href="/courses/" class="btn btn-primary">View Courses</a>
-        </div>
-    </section>
-
-<!-- Featured Courses Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <h2 class="text-center mb-4" style="color: #0A2540;">Featured Courses</h2>
-        
-        <!-- Short Certificate Courses -->
-        <h3 style="color: #DAA520;">Short Certificate Courses</h3>
-        <div class="row">
-            {% for course in short_courses %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow" style="border-color: #DAA520;">
-                    {% if course.image %}
-                    <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }} thumbnail">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title" style="color: #0A2540;">{{ course.title }}</h5>
-                        <p class="card-text">{{ course.description|truncatewords:20 }}</p>
-                        <p>Duration: {{ course.duration }} | Fee: K{{ course.fee }}</p>
-                        <a href="{% url 'enroll_course' course.slug %}" class="btn btn-primary" style="background-color: #FF8C00;">Enroll Now</a>
-                    </div>
-                    <a href="/courses/#certificate" class="btn btn-secondary">View All Certificate Courses</a>
+<!-- Hero Carousel Section -->
+<div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+    </div>
+    
+    <div class="carousel-inner">
+        <!-- Slide 1 -->
+        <div class="carousel-item active">
+            <div class="hero" style="background: linear-gradient(135deg, #001F3F 0%, #003366 100%);">
+                <div class="container" data-aos="fade-up">
+                    <h1 class="display-3 mb-4">Think it, Design it, Code it</h1>
+                    <p class="lead mb-4">Our immersive programs equip you with the latest skills, real-world projects, and expert mentorship to thrive in the fast-paced world of applied sciences and technology.</p>
+                    <a href="/courses/" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-book-open"></i> Explore Courses
+                    </a>
+                    <a href="/enroll/" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-user-plus"></i> Apply Now
+                    </a>
                 </div>
             </div>
-            {% empty %}
-            <p class="text-center">No short courses available yet.</p>
-            {% endfor %}
+        </div>
+        
+        <!-- Slide 2 -->
+        <div class="carousel-item">
+            <div class="hero" style="background: linear-gradient(135deg, #8B0000 0%, #B22222 100%);">
+                <div class="container" data-aos="fade-up">
+                    <h1 class="display-3 mb-4">Build Your Future with Us</h1>
+                    <p class="lead mb-4">Get equipped with necessary skills through our certificate and diploma programmes. Online courses to further your career - Register now!</p>
+                    <a href="/about/" class="btn btn-warning btn-lg me-3">
+                        <i class="fas fa-info-circle"></i> Learn More
+                    </a>
+                    <a href="/contact/" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-phone"></i> Contact Us
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 3 -->
+        <div class="carousel-item">
+            <div class="hero" style="background: linear-gradient(135deg, #FFA500 0%, #FFD700 100%); color: #001F3F;">
+                <div class="container" data-aos="fade-up">
+                    <h1 class="display-3 mb-4" style="color: #001F3F;">Your Pathway to Success</h1>
+                    <p class="lead mb-4" style="color: #001F3F;">Join thousands of successful graduates who have transformed their careers through our comprehensive training programs.</p>
+                    <a href="{% url 'student_portal:dashboard' %}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-sign-in-alt"></i> Student Portal
+                    </a>
+                    <a href="/courses/" class="btn btn-dark btn-lg">
+                        <i class="fas fa-graduation-cap"></i> View Programs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </button>
+</div>
+
+<!-- Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center section-title mb-5" data-aos="fade-up">Why Choose SIAT?</h2>
+        <div class="row">
+            <!-- Feature 1 -->
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="text-center p-4 h-100 shadow-sm bg-white rounded">
+                    <div class="mb-3">
+                        <i class="fas fa-chalkboard-teacher" style="font-size: 3rem; color: #FFA500;"></i>
+                    </div>
+                    <h5 class="mb-3" style="color: #001F3F;">Expert Instructors</h5>
+                    <p class="text-muted">Learn from the best in the business! Our rockstar instructors share their secrets and make learning fun and engaging.</p>
+                </div>
+            </div>
             
+            <!-- Feature 2 -->
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-center p-4 h-100 shadow-sm bg-white rounded">
+                    <div class="mb-3">
+                        <i class="fas fa-project-diagram" style="font-size: 3rem; color: #FFD700;"></i>
+                    </div>
+                    <h5 class="mb-3" style="color: #001F3F;">Real-World Projects</h5>
+                    <p class="text-muted">Learn by doing! Gain practical experience and showcase your skills to potential employers through industry-relevant projects.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="text-center p-4 h-100 shadow-sm bg-white rounded">
+                    <div class="mb-3">
+                        <i class="fas fa-question-circle" style="font-size: 3rem; color: #B22222;"></i>
+                    </div>
+                    <h5 class="mb-3" style="color: #001F3F;">Doubt-Solving Sessions</h5>
+                    <p class="text-muted">Get one-on-one support through dedicated doubt-solving sessions, ensuring thorough understanding and mastery of the material.</p>
+                </div>
+            </div>
+            
+            <!-- Feature 4 -->
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="text-center p-4 h-100 shadow-sm bg-white rounded">
+                    <div class="mb-3">
+                        <i class="fas fa-book-reader" style="font-size: 3rem; color: #003366;"></i>
+                    </div>
+                    <h5 class="mb-3" style="color: #001F3F;">Resource Library</h5>
+                    <p class="text-muted">Our comprehensive library is your go-to resource for in-depth learning and exploration beyond the classroom.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Courses Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center section-title mb-5" data-aos="fade-up">Featured Courses</h2>
+        
+        <!-- Short Certificate Courses -->
+        <div class="mb-5">
+            <h3 style="color: #DAA520;" class="mb-4" data-aos="fade-right">
+                <i class="fas fa-certificate"></i> Short Certificate Courses
+            </h3>
+            <div class="row">
+                {% for course in short_courses %}
+                <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00">
+                    <div class="card h-100 shadow-lg border-0" style="transition: transform 0.3s; border-top: 4px solid #DAA520;">
+                        {% if course.image %}
+                        <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-gradient" style="height: 200px; background: linear-gradient(135deg, #FFA500 0%, #FFD700 100%); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-graduation-cap" style="font-size: 4rem; color: white;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title" style="color: #0A2540;">{{ course.title }}</h5>
+                            <p class="card-text text-muted">{{ course.description|truncatewords:20 }}</p>
+                            <div class="mb-3">
+                                <span class="badge bg-info me-2"><i class="fas fa-clock"></i> {{ course.duration }}</span>
+                                <span class="badge bg-success"><i class="fas fa-money-bill"></i> K{{ course.fee }}</span>
+                            </div>
+                            <a href="{% url 'enroll_course' course.slug %}" class="btn btn-primary w-100">
+                                <i class="fas fa-user-plus"></i> Enroll Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p class="text-center alert alert-info">
+                        <i class="fas fa-info-circle"></i> No short certificate courses available yet.
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+            {% if short_courses %}
+            <div class="text-center mt-3">
+                <a href="/courses/#certificate" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-right"></i> View All Certificate Courses
+                </a>
+            </div>
+            {% endif %}
         </div>
         
         <!-- Diploma Courses -->
-        <h3 style="color: #DAA520;">Diploma Courses</h3>
-        <div class="row">
-            {% for course in diploma_courses %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow" style="border-color: #DAA520;">
-                    {% if course.image %}
-                    <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }} thumbnail">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title" style="color: #0A2540;">{{ course.title }}</h5>
-                        <p class="card-text">{{ course.description|truncatewords:20 }}</p>
-                        <p>Duration: {{ course.duration }} | Fee: K{{ course.fee }}</p>
-                        <a href="{% url 'enroll_course' course.slug %}" class="btn btn-primary" style="background-color: #FF8C00;">Enroll Now</a>
+        <div>
+            <h3 style="color: #DAA520;" class="mb-4" data-aos="fade-right">
+                <i class="fas fa-award"></i> Diploma Courses
+            </h3>
+            <div class="row">
+                {% for course in diploma_courses %}
+                <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="{{ forloop.counter }}00">
+                    <div class="card h-100 shadow-lg border-0" style="transition: transform 0.3s; border-top: 4px solid #B22222;">
+                        {% if course.image %}
+                        <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-gradient" style="height: 200px; background: linear-gradient(135deg, #B22222 0%, #8B0000 100%); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-award" style="font-size: 4rem; color: white;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title" style="color: #0A2540;">{{ course.title }}</h5>
+                            <p class="card-text text-muted">{{ course.description|truncatewords:20 }}</p>
+                            <div class="mb-3">
+                                <span class="badge bg-info me-2"><i class="fas fa-clock"></i> {{ course.duration }}</span>
+                                <span class="badge bg-success"><i class="fas fa-money-bill"></i> K{{ course.fee }}</span>
+                            </div>
+                            <a href="{% url 'enroll_course' course.slug %}" class="btn btn-primary w-100">
+                                <i class="fas fa-user-plus"></i> Enroll Now
+                            </a>
+                        </div>
                     </div>
-                    <a href="/courses/#diploma" class="btn btn-secondary">View All Diploma Courses</a>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p class="text-center alert alert-info">
+                        <i class="fas fa-info-circle"></i> No diploma courses available yet.
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+            {% if diploma_courses %}
+            <div class="text-center mt-3">
+                <a href="/courses/#diploma" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-right"></i> View All Diploma Courses
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<!--section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center section-title mb-5" data-aos="fade-up">
+            <i class="fas fa-comments"></i> What Our Students Say
+        </h2>
+        
+        <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card border-0 shadow-lg">
+                                <div class="card-body p-5 text-center">
+                                    <i class="fas fa-quote-left fa-3x mb-4" style="color: #FFA500; opacity: 0.3;"></i>
+                                    <p class="lead mb-4">"SIAT transformed my career! The hands-on approach and expert instructors helped me land my dream job in just 6 months."</p>
+                                    <div class="mb-2">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                    </div>
+                                    <h5 class="mb-1" style="color: #001F3F;">John Mwanza</h5>
+                                    <p class="text-muted"><i class="fas fa-map-marker-alt"></i> Monze, Zambia</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="carousel-item">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card border-0 shadow-lg">
+                                <div class="card-body p-5 text-center">
+                                    <i class="fas fa-quote-left fa-3x mb-4" style="color: #FFA500; opacity: 0.3;"></i>
+                                    <p class="lead mb-4">"The practical skills I gained at SIAT gave me confidence to start my own tech business. Forever grateful!"</p>
+                                    <div class="mb-2">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                    </div>
+                                    <h5 class="mb-1" style="color: #001F3F;">Grace Phiri</h5>
+                                    <p class="text-muted"><i class="fas fa-map-marker-alt"></i> Lusaka, Zambia</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="carousel-item">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card border-0 shadow-lg">
+                                <div class="card-body p-5 text-center">
+                                    <i class="fas fa-quote-left fa-3x mb-4" style="color: #FFA500; opacity: 0.3;"></i>
+                                    <p class="lead mb-4">"Best decision ever! The instructors are knowledgeable and the facilities are top-notch. Highly recommended!"</p>
+                                    <div class="mb-2">
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                        <i class="fas fa-star text-warning"></i>
+                                    </div>
+                                    <h5 class="mb-1" style="color: #001F3F;">David Banda</h5>
+                                    <p class="text-muted"><i class="fas fa-map-marker-alt"></i> Choma, Zambia</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            {% empty %}
-            <p class="text-center">No diploma courses available yet.</p>
-            {% endfor %}
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev" style="filter: invert(1);">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next" style="filter: invert(1);">
+                <span class="carousel-control-next-icon"></span>
+            </button>
         </div>
+    </div>
+</section-->
+
+<!-- Call to Action Section -->
+<section class="py-5" style="background: linear-gradient(135deg, #001F3F 0%, #003366 100%); color: white;">
+    <div class="container text-center" data-aos="fade-up">
+        <h2 class="mb-4">Ready to Transform Your Future?</h2>
+        <p class="lead mb-4">Join thousands of successful graduates and start your journey today!</p>
+        <a href="/enroll/" class="btn btn-warning btn-lg me-3">
+            <i class="fas fa-rocket"></i> Apply Now
+        </a>
+        <a href="/contact/" class="btn btn-outline-light btn-lg">
+            <i class="fas fa-phone-alt"></i> Talk to an Advisor
+        </a>
     </div>
 </section>
 
@@ -72,7 +325,7 @@
 <meta name="description" content="{{ meta_description }}">
 <meta name="keywords" content="{{ keywords }}">
 
-<!-- Schema.org JSON-LD for SEO (Educational Org and Courses) -->
+<!-- Schema.org JSON-LD for SEO -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -107,4 +360,16 @@
   ]
 }
 </script>
+
+<style>
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+}
+
+.carousel-item {
+    transition: transform 0.6s ease-in-out;
+}
+</style>
+
 {% endblock %}

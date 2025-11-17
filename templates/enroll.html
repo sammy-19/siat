@@ -1,191 +1,348 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Apply{% endblock %}
 {% block content %}
-<section class="py-5 bg-light">
+
+<!-- Page Header -->
+<div class="hero" style="padding: 60px 0; background: linear-gradient(135deg, #B22222 0%, #8B0000 100%);">
+    <div class="container text-center">
+        <h1 class="display-4 mb-3" data-aos="fade-down">
+            <i class="fas fa-user-plus"></i> Apply to SIAT
+        </h1>
+        <p class="lead" data-aos="fade-up">
+            {% if course %}Enrollment Application for {{ course.title }}{% else %}Start Your Journey Today{% endif %}
+        </p>
+    </div>
+</div>
+
+<!-- Application Form -->
+<section class="py-5">
     <div class="container">
-        <h2 class="text-center mb-4" style="color: #FF8C00;">Enrollment Application for {% if course %}{{ course.title }}{% else %}a Course{% endif %}</h2>
-        <form method="post" enctype="multipart/form-data" class="mx-auto shadow p-4 bg-white rounded" style="max-width: 800px;">
-            {% csrf_token %}
-            
-            <!-- Accordion for Sections -->
-            <div class="accordion" id="enrollAccordion">
-                
-                <!-- Personal Info -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingPersonal">
-                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePersonal" aria-expanded="true" aria-controls="collapsePersonal" style="background-color: #0A2540; color: #FFFFFF;">
-                            Personal Information
-                        </button>
-                    </h2>
-                    <div id="collapsePersonal" class="accordion-collapse collapse show" aria-labelledby="headingPersonal">
-                        <div class="accordion-body">
-                            <div class="mb-3">
-                                {{ form.full_name.label_tag }}
-                                {{ form.full_name }}
-                                {{ form.full_name.errors }}
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card border-0 shadow-lg" data-aos="zoom-in">
+                    <div class="card-body p-4">
+                        <!-- Progress Indicator -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <small class="text-muted">Application Progress</small>
+                                <small class="text-muted">Complete all sections</small>
                             </div>
-                            <div class="mb-3">
-                                {{ form.email.label_tag }}
-                                {{ form.email }}
-                                {{ form.email.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.phone.label_tag }}
-                                {{ form.phone }}
-                                {{ form.phone.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.gender.label_tag }}
-                                {{ form.gender }}
-                                {{ form.gender.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.date_of_birth.label_tag }}
-                                {{ form.date_of_birth }}
-                                {{ form.date_of_birth.errors }}
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-success" style="width: 0%" id="formProgress"></div>
                             </div>
                         </div>
+                        
+                        <form method="post" enctype="multipart/form-data" id="enrollForm">
+                            {% csrf_token %}
+                            
+                            <!-- Accordion for Sections -->
+                            <div class="accordion" id="enrollAccordion">
+                                
+                                <!-- Personal Info -->
+                                <div class="accordion-item mb-3 border-0 shadow-sm">
+                                    <h2 class="accordion-header" id="headingPersonal">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePersonal" style="background: linear-gradient(135deg, #001F3F 0%, #003366 100%); color: white;">
+                                            <i class="fas fa-user me-2"></i> 1. Personal Information
+                                        </button>
+                                    </h2>
+                                    <div id="collapsePersonal" class="accordion-collapse collapse show">
+                                        <div class="accordion-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-user"></i> {{ form.full_name.label }}</label>
+                                                    {{ form.full_name }}
+                                                    {{ form.full_name.errors }}
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-envelope"></i> {{ form.email.label }}</label>
+                                                    {{ form.email }}
+                                                    {{ form.email.errors }}
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-phone"></i> {{ form.phone.label }}</label>
+                                                    {{ form.phone }}
+                                                    {{ form.phone.errors }}
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-venus-mars"></i> {{ form.gender.label }}</label>
+                                                    {{ form.gender }}
+                                                    {{ form.gender.errors }}
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-calendar"></i> {{ form.date_of_birth.label }}</label>
+                                                    {{ form.date_of_birth }}
+                                                    {{ form.date_of_birth.errors }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Education -->
+                                <div class="accordion-item mb-3 border-0 shadow-sm">
+                                    <h2 class="accordion-header" id="headingEducation">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEducation" style="background: linear-gradient(135deg, #FFA500 0%, #FFD700 100%); color: #001F3F;">
+                                            <i class="fas fa-graduation-cap me-2"></i> 2. Education Background
+                                        </button>
+                                    </h2>
+                                    <div id="collapseEducation" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <label class="form-label"><i class="fas fa-certificate"></i> {{ form.highest_qualification.label }}</label>
+                                                {{ form.highest_qualification }}
+                                                {{ form.highest_qualification.errors }}
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label"><i class="fas fa-school"></i> {{ form.education_background.label }}</label>
+                                                {{ form.education_background }}
+                                                {{ form.education_background.errors }}
+                                                <small class="form-text text-muted">School Name, Grades, Final Year Attended</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Next of Kin -->
+                                <div class="accordion-item mb-3 border-0 shadow-sm">
+                                    <h2 class="accordion-header" id="headingKin">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseKin" style="background: linear-gradient(135deg, #B22222 0%, #8B0000 100%); color: white;">
+                                            <i class="fas fa-users me-2"></i> 3. Next of Kin
+                                        </button>
+                                    </h2>
+                                    <div id="collapseKin" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-user-friends"></i> {{ form.next_of_kin_name.label }}</label>
+                                                    {{ form.next_of_kin_name }}
+                                                    {{ form.next_of_kin_name.errors }}
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-heart"></i> {{ form.next_of_kin_relationship.label }}</label>
+                                                    {{ form.next_of_kin_relationship }}
+                                                    {{ form.next_of_kin_relationship.errors }}
+                                                </div>
+                                                <div class="col-md-12 mb-3">
+                                                    <label class="form-label"><i class="fas fa-phone"></i> {{ form.next_of_kin_contact.label }}</label>
+                                                    {{ form.next_of_kin_contact }}
+                                                    {{ form.next_of_kin_contact.errors }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Identity & Disability -->
+                                <div class="accordion-item mb-3 border-0 shadow-sm">
+                                    <h2 class="accordion-header" id="headingIdentity">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIdentity" style="background: linear-gradient(135deg, #003366 0%, #001F3F 100%); color: white;">
+                                            <i class="fas fa-id-card me-2"></i> 4. Identity & Disability Status
+                                        </button>
+                                    </h2>
+                                    <div id="collapseIdentity" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-id-badge"></i> {{ form.identity_type.label }}</label>
+                                                    {{ form.identity_type }}
+                                                    {{ form.identity_type.errors }}
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-hashtag"></i> {{ form.identity_number.label }}</label>
+                                                    {{ form.identity_number }}
+                                                    {{ form.identity_number.errors }}
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-wheelchair"></i> {{ form.disability_status.label }}</label>
+                                                    {{ form.disability_status }}
+                                                    {{ form.disability_status.errors }}
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label"><i class="fas fa-info-circle"></i> {{ form.disability_details.label }}</label>
+                                                    {{ form.disability_details }}
+                                                    {{ form.disability_details.errors }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Documents -->
+                                <div class="accordion-item mb-3 border-0 shadow-sm">
+                                    <h2 class="accordion-header" id="headingDocuments">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDocuments" style="background: linear-gradient(135deg, #FFD700 0%, #DAA520 100%); color: #001F3F;">
+                                            <i class="fas fa-file-upload me-2"></i> 5. Document Uploads
+                                        </button>
+                                    </h2>
+                                    <div id="collapseDocuments" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle"></i> 
+                                                <strong>Accepted formats:</strong> PDF, JPG, PNG | 
+                                                <strong>Required:</strong> Identity Document | 
+                                                <strong>For Diplomas:</strong> Secondary Results
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label"><i class="fas fa-id-card"></i> {{ form.identity_document.label }}</label>
+                                                {{ form.identity_document }}
+                                                {{ form.identity_document.errors }}
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label"><i class="fas fa-file-alt"></i> {{ form.secondary_results.label }}</label>
+                                                {{ form.secondary_results }}
+                                                {{ form.secondary_results.errors }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Course & Message -->
+                                <div class="accordion-item mb-3 border-0 shadow-sm">
+                                    <h2 class="accordion-header" id="headingOther">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOther" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: white;">
+                                            <i class="fas fa-book me-2"></i> 6. Course Selection & Message
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOther" class="accordion-collapse collapse">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <label class="form-label"><i class="fas fa-graduation-cap"></i> {{ form.course.label }}</label>
+                                                {{ form.course }}
+                                                {{ form.course.errors }}
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label"><i class="fas fa-comment-alt"></i> {{ form.message.label }}</label>
+                                                {{ form.message }}
+                                                {{ form.message.errors }}
+                                                <small class="form-text text-muted">Tell us why you want to join SIAT (optional)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #FF8C00 0%, #FFA500 100%); border: none;">
+                                    <i class="fas fa-paper-plane me-2"></i> Submit Application
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 
-                <!-- Education -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingEducation">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEducation" aria-expanded="false" aria-controls="collapseEducation" style="background-color: #0A2540; color: #FFFFFF;">
-                            Education Background
-                        </button>
-                    </h2>
-                    <div id="collapseEducation" class="accordion-collapse collapse" aria-labelledby="headingEducation">
-                        <div class="accordion-body">
-                            <div class="mb-3">
-                                {{ form.highest_qualification.label_tag }}
-                                {{ form.highest_qualification }}
-                                {{ form.highest_qualification.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.education_background.label_tag }}
-                                {{ form.education_background }}
-                                {{ form.education_background.errors }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Next of Kin -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingKin">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseKin" aria-expanded="false" aria-controls="collapseKin" style="background-color: #0A2540; color: #FFFFFF;">
-                            Next of Kin
-                        </button>
-                    </h2>
-                    <div id="collapseKin" class="accordion-collapse collapse" aria-labelledby="headingKin">
-                        <div class="accordion-body">
-                            <div class="mb-3">
-                                {{ form.next_of_kin_name.label_tag }}
-                                {{ form.next_of_kin_name }}
-                                {{ form.next_of_kin_name.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.next_of_kin_relationship.label_tag }}
-                                {{ form.next_of_kin_relationship }}
-                                {{ form.next_of_kin_relationship.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.next_of_kin_contact.label_tag }}
-                                {{ form.next_of_kin_contact }}
-                                {{ form.next_of_kin_contact.errors }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Identity & Disability -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingIdentity">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseIdentity" aria-expanded="false" aria-controls="collapseIdentity" style="background-color: #0A2540; color: #FFFFFF;">
-                            Identity & Disability Status
-                        </button>
-                    </h2>
-                    <div id="collapseIdentity" class="accordion-collapse collapse" aria-labelledby="headingIdentity">
-                        <div class="accordion-body">
-                            <div class="mb-3">
-                                {{ form.identity_type.label_tag }}
-                                {{ form.identity_type }}
-                                {{ form.identity_type.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.identity_number.label_tag }}
-                                {{ form.identity_number }}
-                                {{ form.identity_number.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.disability_status.label_tag }}
-                                {{ form.disability_status }}
-                                {{ form.disability_status.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.disability_details.label_tag }}
-                                {{ form.disability_details }}
-                                {{ form.disability_details.errors }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Documents -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingDocuments">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDocuments" aria-expanded="false" aria-controls="collapseDocuments" style="background-color: #0A2540; color: #FFFFFF;">
-                            Document Uploads
-                        </button>
-                    </h2>
-                    <div id="collapseDocuments" class="accordion-collapse collapse" aria-labelledby="headingDocuments">
-                        <div class="accordion-body">
-                            <p class="mb-3"><small>Accepted: PDF, JPG, PNG. Required: Identity Doc. For Diplomas: Secondary Results.</small></p>
-                            <div class="mb-3">
-                                {{ form.identity_document.label_tag }}
-                                {{ form.identity_document }}
-                                {{ form.identity_document.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.secondary_results.label_tag }}
-                                {{ form.secondary_results }}
-                                {{ form.secondary_results.errors }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Other -->
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingOther">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOther" aria-expanded="false" aria-controls="collapseOther" style="background-color: #0A2540; color: #FFFFFF;">
-                            Course & Message
-                        </button>
-                    </h2>
-                    <div id="collapseOther" class="accordion-collapse collapse" aria-labelledby="headingOther">
-                        <div class="accordion-body">
-                            <div class="mb-3">
-                                {{ form.course.label_tag }}
-                                {{ form.course }}
-                                {{ form.course.errors }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.message.label_tag }}
-                                {{ form.message }}
-                                {{ form.message.errors }}
-                            </div>
-                        </div>
+                <!-- Help Section -->
+                <div class="card border-0 shadow mt-4" data-aos="fade-up">
+                    <div class="card-body p-4">
+                        <h5><i class="fas fa-question-circle text-primary"></i> Need Help?</h5>
+                        <p class="mb-0">Contact us at <a href="tel:{{ info.phone }}">{{ info.phone|default:"+260 762 516 232" }}</a> or email <a href="mailto:{{ info.email }}">{{ info.email|default:"sunriseinstituteofapplied21@gmail.com" }}</a></p>
                     </div>
                 </div>
             </div>
-            
-            <button type="submit" class="btn btn-primary w-100 mt-4" style="background-color: #FF8C00; border-color: #DAA520;">Submit Application</button>
-        </form>
+        </div>
     </div>
 </section>
 
-<!-- SEO Schema.org JSON-LD -->
+<!-- Application Benefits -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h3 class="text-center section-title mb-5" data-aos="fade-up">
+            <i class="fas fa-check-circle"></i> What Happens After You Apply?
+        </h3>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="zoom-in" data-aos-delay="100">
+                <div class="text-center p-3">
+                    <div class="rounded-circle bg-primary text-white mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <strong style="font-size: 1.5rem;">1</strong>
+                    </div>
+                    <h5>Review</h5>
+                    <p class="text-muted">We review your application within 2-3 business days</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="zoom-in" data-aos-delay="200">
+                <div class="text-center p-3">
+                    <div class="rounded-circle bg-warning text-white mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <strong style="font-size: 1.5rem;">2</strong>
+                    </div>
+                    <h5>Notification</h5>
+                    <p class="text-muted">You receive an acceptance or feedback email</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="zoom-in" data-aos-delay="300">
+                <div class="text-center p-3">
+                    <div class="rounded-circle bg-success text-white mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <strong style="font-size: 1.5rem;">3</strong>
+                    </div>
+                    <h5>Enrollment</h5>
+                    <p class="text-muted">Complete registration and receive your student ID</p>
+                </div>
+            </div>
+            
+            <div class="col-md-3 col-sm-6 mb-4" data-aos="zoom-in" data-aos-delay="400">
+                <div class="text-center p-3">
+                    <div class="rounded-circle bg-danger text-white mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <strong style="font-size: 1.5rem;">4</strong>
+                    </div>
+                    <h5>Start Learning</h5>
+                    <p class="text-muted">Begin your journey to success!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<meta name="description" content="{{ meta_description }}">
+<meta name="keywords" content="{{ meta_keywords }}">
+
+<script>
+// Track form completion progress
+const accordionItems = document.querySelectorAll('.accordion-collapse');
+const progressBar = document.getElementById('formProgress');
+const totalSections = accordionItems.length;
+
+function updateProgress() {
+    let completedSections = 0;
+    accordionItems.forEach(item => {
+        const inputs = item.querySelectorAll('input, select, textarea');
+        let sectionFilled = false;
+        inputs.forEach(input => {
+            if (input.value && input.value.trim() !== '') {
+                sectionFilled = true;
+            }
+        });
+        if (sectionFilled) completedSections++;
+    });
+    
+    const progress = (completedSections / totalSections) * 100;
+    progressBar.style.width = progress + '%';
+}
+
+document.getElementById('enrollForm').addEventListener('input', updateProgress);
+document.addEventListener('DOMContentLoaded', updateProgress);
+</script>
+
+<style>
+.form-control, .form-select {
+    border: 2px solid #e9ecef;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #FFA500;
+    box-shadow: 0 0 0 0.25rem rgba(255, 165, 0, 0.25);
+}
+
+.accordion-button:not(.collapsed) {
+    box-shadow: none;
+}
+</style>
+
+<!-- Schema.org JSON-LD -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -199,6 +356,4 @@
 }
 </script>
 
-<meta name="description" content="{{ meta_description }}">
-<meta name="keywords" content="{{ meta_keywords }}">
 {% endblock %}

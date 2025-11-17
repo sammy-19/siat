@@ -1,73 +1,343 @@
 {% extends 'base.html' %}
-{% block title %}Contact{% endblock %}
+{% load static %}
+
+{% block title %}Contact Us{% endblock %}
 {% block content %}
-    <section class="container my-5">
-        <h2 class="section-title">Get in Touch</h2>
-        <p>Phone: {{ info.phone }}</p>
-        <p class="mb-4">Our phone line is available Monday to Friday, 07:00 to 18:00, for immediate assistance with course registrations, program details, or general inquiries. Feel free to call us for personalized guidance on boosting your career through our online courses or diploma programs.</p>
-        <p>Email: {{ info.email }}</p>
-        <p class="mb-4">Send us an email for detailed questions about our mission, vision, or specific courses like Business Management or Information Technology. We respond within 24-48 hours and can provide information on our commitment to diversity, equity, inclusion, and quality education as outlined in our profile.</p>
-        <p>Address: {{ info.address }}</p>
-        <p class="mb-4">Visit our campus for in-person consultations, enrollment support, or to learn more about our facilities. We're dedicated to creating an inclusive environment for learning, as per our guiding principles of social justice and global citizenship.</p>
-    </section>
 
-    <!-- Additional Section: Contact Form for Modern Interactivity -->
-    <section class="container my-5 bg-light p-4 rounded shadow">
-        <h3 style="color: #0A2540;">Send Us a Message</h3>
-        <p>Fill out the form below to reach our team. Whether you're interested in our short certificate courses, diploma programs, or have questions about our quality assurance, research opportunities, or HIV/AIDS support initiatives, we'll get back to you promptly.</p>
-        <form method="post">
-            {% csrf_token %}
-            <div class="mb-3">
-                {{ form.name.label_tag }}
-                {{ form.name }}
+<!-- Page Header -->
+<div class="hero" style="padding: 60px 0; background: linear-gradient(135deg, #001F3F 0%, #003366 100%);">
+    <div class="container text-center">
+        <h1 class="display-4 mb-3" data-aos="fade-down">
+            <i class="fas fa-envelope"></i> Get in Touch
+        </h1>
+        <p class="lead" data-aos="fade-up">We'd love to hear from you. Reach out today!</p>
+    </div>
+</div>
+
+<!-- Contact Information Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Monze Campus -->
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 shadow-lg h-100" style="border-top: 5px solid #FFA500;">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-map-marker-alt fa-3x" style="color: #FFA500;"></i>
+                        </div>
+                        <h4 class="mb-3" style="color: #001F3F;">Monze Campus</h4>
+                        <p class="text-muted mb-3">
+                            <i class="fas fa-location-dot"></i><br>
+                            Monze, Southern Province<br>
+                            Zambia
+                        </p>
+                        <hr>
+                        <p class="mb-2">
+                            <i class="fas fa-phone text-primary"></i>
+                            <a href="tel:{{ info.phone }}" class="text-decoration-none">{{ info.phone|default:"+260 762 516 232" }}</a>
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-mobile-alt text-primary"></i>
+                            <a href="tel:+260972102339" class="text-decoration-none">+260 972 102 339</a>
+                        </p>
+                        <p>
+                            <i class="fas fa-envelope text-primary"></i>
+                            <a href="mailto:{{ info.email }}" class="text-decoration-none">{{ info.email|default:"sunriseinstituteofapplied21@gmail.com" }}</a>
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-                {{ form.email.label_tag }}
-                {{ form.email }}
+            
+            <!-- Kenya Campus -->
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 shadow-lg h-100" style="border-top: 5px solid #FFD700;">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-map-marker-alt fa-3x" style="color: #FFD700;"></i>
+                        </div>
+                        <h4 class="mb-3" style="color: #001F3F;">Another Campus</h4>
+                        <p class="text-muted mb-3">
+                            <i class="fas fa-location-dot"></i><br>
+                            On The Way<br>
+                            (Coming Soon)
+                        </p>
+                        <hr>
+                        <p class="mb-2">
+                            <i class="fas fa-phone text-primary"></i>
+                            <a href="tel:+260" class="text-decoration-none">+260 (Contact TBA)</a>
+                        </p>
+                        <p>
+                            <i class="fas fa-envelope text-primary"></i>
+                            <a href="mailto:kenya@sunrise-institute.net" class="text-decoration-none">kenya@sunrise-institute.net</a>
+                        </p>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-                {{ form.subject.label_tag }}
-                {{ form.subject }}
+            
+            <!-- Working Hours -->
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card border-0 shadow-lg h-100" style="border-top: 5px solid #B22222;">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="fas fa-clock fa-3x" style="color: #B22222;"></i>
+                        </div>
+                        <h4 class="mb-3" style="color: #001F3F;">Working Hours</h4>
+                        <p class="text-muted mb-3">We're here to help!</p>
+                        <hr>
+                        <div class="text-start">
+                            <p class="mb-2">
+                                <i class="fas fa-calendar-day text-primary"></i>
+                                <strong>Monday - Friday</strong><br>
+                                <span class="ms-4">8:00 AM - 5:00 PM</span>
+                            </p>
+                            <p class="mb-2">
+                                <i class="fas fa-calendar-week text-primary"></i>
+                                <strong>Saturday</strong><br>
+                                <span class="ms-4">9:00 AM - 1:00 PM</span>
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-calendar-times text-danger"></i>
+                                <strong>Sunday</strong><br>
+                                <span class="ms-4">Closed</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-                {{ form.message.label_tag }}
-                {{ form.message }}
+        </div>
+    </div>
+</section>
+
+<!-- Contact Form Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-lg" data-aos="zoom-in">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-paper-plane fa-3x mb-3" style="color: #FFA500;"></i>
+                            <h3 style="color: #001F3F;">Send Us a Message</h3>
+                            <p class="text-muted">Fill out the form below and we'll get back to you within 24-48 hours</p>
+                        </div>
+                        
+                        {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle"></i> {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.name.id_for_label }}" class="form-label">
+                                        <i class="fas fa-user"></i> Your Name
+                                    </label>
+                                    {{ form.name }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                                        <i class="fas fa-envelope"></i> Email Address
+                                    </label>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.subject.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tag"></i> Subject
+                                </label>
+                                {{ form.subject }}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.message.id_for_label }}" class="form-label">
+                                    <i class="fas fa-comment-alt"></i> Message
+                                </label>
+                                {{ form.message }}
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-paper-plane"></i> Send Message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary" style="background-color: #FF8C00; border-color: #DAA520;">Submit</button>
-        </form>
-    </section>
+        </div>
+    </div>
+</section>
 
-    <!-- Additional Section: Social Media Links (Inferred/Placeholder) -->
-    <section class="container my-5">
-        <h3 style="color: #0A2540;">Connect with Us Online</h3>
-        <p>Follow us on social media for updates on courses, events, and our commitment to gender equality, religious pluralism, and community development.</p>
-        <ul class="list-unstyled">
-            <li><a href="https://m.facebook.com/madzvision/?_rdc=1&_rdr#" style="color: #FF8C00;">Facebook</a> - Join discussions on education and social justice.</li>
-    </section>
+<!-- Social Media & Quick Contact -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Social Media -->
+            <div class="col-md-6 mb-4" data-aos="fade-right">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">
+                            <i class="fas fa-share-nodes" style="color: #FFA500;"></i> Connect With Us
+                        </h4>
+                        <p class="text-muted mb-4">Follow us on social media for updates on courses, events, and success stories</p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="https://m.facebook.com/madzvision/" target="_blank" class="btn btn-outline-primary btn-lg">
+                                <i class="fab fa-facebook fa-2x"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-info btn-lg">
+                                <i class="fab fa-twitter fa-2x"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-lg">
+                                <i class="fab fa-linkedin fa-2x"></i>
+                            </a>
+                            <a href="#" class="btn btn-outline-danger btn-lg">
+                                <i class="fab fa-instagram fa-2x"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Contact Options -->
+            <div class="col-md-6 mb-4" data-aos="fade-left">
+                <div class="card border-0 shadow h-100">
+                    <div class="card-body p-4">
+                        <h4 class="mb-4">
+                            <i class="fas fa-headset" style="color: #B22222;"></i> Need Immediate Help?
+                        </h4>
+                        <p class="text-muted mb-4">Our phone lines are available for immediate assistance</p>
+                        <div class="d-grid gap-3">
+                            <a href="tel:{{ info.phone }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-phone"></i> Call Us: {{ info.phone|default:"+260 762 516 232" }}
+                            </a>
+                            <a href="mailto:{{ info.email }}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-envelope"></i> Email Us
+                            </a>
+                            <a href="https://wa.me/260762516232" target="_blank" class="btn btn-success btn-lg">
+                                <i class="fab fa-whatsapp"></i> WhatsApp Us
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <!-- Additional Section: Embedded Map for Visual Explanation -->
-    <section class="container my-5">
-        <h3 style="color: #0A2540;">Find Us on the Map</h3>
-        <p>Our location supports easy access for students from Zambia and beyond.</p>
-        <!-- iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3891.123456789!2d28.123456789!3d-15.123456789!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTXCsDEyJzM0LjQiUyAyOMKwMDcnMjMuMiJF!5e0!3m2!1sen!2sus!4v1234567890" width="100%" height="400" style="border:0; border-radius: 0.25rem; border: 1px solid #DAA520;" allowfullscreen="" loading="lazy"></iframe>
-        <Update embed URL with real coordinates from address -->
-    </section>
+<!-- Map Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h3 class="text-center section-title mb-5" data-aos="fade-up">
+            <i class="fas fa-map"></i> Find Us on the Map
+        </h3>
+        <div class="card border-0 shadow" data-aos="zoom-in">
+            <div class="card-body p-0">
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d122064.16290816846!2d27.4!3d-16.28!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDE2JzQ4LjAiUyAyN8KwMjQnMDAuMCJF!5e0!3m2!1sen!2szm!4v1234567890" 
+                    width="100%" 
+                    height="450" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+        <p class="text-center text-muted mt-3">
+            <i class="fas fa-info-circle"></i> Our location supports easy access for students from Zambia and beyond
+        </p>
+    </div>
+</section>
 
-    <!-- SEO Enhancements -->
-    <meta name="description" content="{{ meta_description }}">
-    <meta name="keywords" content="{{ meta_keywords }}">
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <h3 class="text-center section-title mb-5" data-aos="fade-up">
+            <i class="fas fa-question-circle"></i> Frequently Asked Questions
+        </h3>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item mb-3 border-0 shadow" data-aos="fade-up">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                <i class="fas fa-graduation-cap me-2"></i> What programs do you offer?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We offer both short certificate courses and diploma programs in various fields including Business Management, Information Technology, and Applied Sciences.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item mb-3 border-0 shadow" data-aos="fade-up" data-aos-delay="100">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                <i class="fas fa-clock me-2"></i> How long does enrollment take?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                Enrollment typically takes 2-3 business days once all required documents are submitted and verified.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item mb-3 border-0 shadow" data-aos="fade-up" data-aos-delay="200">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                <i class="fas fa-money-bill-wave me-2"></i> What are the payment options?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body">
+                                We accept bank transfers, mobile money, and installment payment plans for your convenience.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-    <!-- Schema.org JSON-LD for Contact Page SEO -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "ContactPoint",
-      "telephone": "{{ info.phone }}",
-      "email": "{{ info.email }}",
-      "address": "{{ info.address }}",
-      "contactType": "Customer Support",
-      "areaServed": "Zambia",
-      "availableLanguage": "English"
-    }
-    </script>
+<!-- SEO Enhancements -->
+<meta name="description" content="{{ meta_description }}">
+<meta name="keywords" content="{{ meta_keywords }}">
+
+<!-- Schema.org JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ContactPoint",
+  "telephone": "{{ info.phone }}",
+  "email": "{{ info.email }}",
+  "address": "{{ info.address }}",
+  "contactType": "Customer Support",
+  "areaServed": "Zambia",
+  "availableLanguage": "English"
+}
+</script>
+
+<style>
+.form-control, .form-select {
+    border: 2px solid #e9ecef;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #FFA500;
+    box-shadow: 0 0 0 0.25rem rgba(255, 165, 0, 0.25);
+}
+</style>
+
 {% endblock %}
